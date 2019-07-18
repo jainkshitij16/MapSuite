@@ -1,0 +1,8 @@
+.DS_Store
+*.pyc
+*.py~
+env
+__pycache__
+migrations
+local_settings.py
+.idea
