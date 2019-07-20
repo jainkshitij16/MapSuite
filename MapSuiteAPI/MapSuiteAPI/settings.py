@@ -85,7 +85,7 @@ DATABASES = {
         'USER': DBUSERNAME,
         'PASSWORD': DBPASSWORD,
         'HOST': DBHOST,
-        'PORT': '5432', # could be port 5432, check if runs properly
+        'PORT': '5432',
     }
 }
 
