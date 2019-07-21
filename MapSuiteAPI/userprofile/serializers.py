@@ -1,4 +1,4 @@
-from .models import Userprofile, Location
+from .models import Userprofile, Annotation
 from rest_framework import serializers
 
 class UserprofileSerializer(serializers.ModelSerializer):
@@ -25,9 +25,9 @@ class UserprofileSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
 
     """
-    A class which is used to represent the serializers for the Location object
+    A class which is used to represent the serializers for the Annotation object
     Required for transforming data from JSON to native python data types and vice-versa
-    Contains similar fields with similar properties as the Location object found in userprofile.models
+    Contains similar fields with similar properties as the Annotation object found in userprofile.models
     """
 
     first_name = serializers.ReadOnlyField(source='owner.user.first_name')
@@ -35,7 +35,7 @@ class LocationSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source='owner.user.username')
 
     class Meta:
-        model = Location
+        model = Annotation
         fields = ('username',
                   'location_name',
                   'latitude',
