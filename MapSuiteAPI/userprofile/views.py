@@ -52,6 +52,7 @@ class AllAnnotations(generics.ListCreateAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
+
 class UserwithAnnotations(generics.ListCreateAPIView):
 
     """
@@ -65,4 +66,5 @@ class UserwithAnnotations(generics.ListCreateAPIView):
     model = Userprofile, Annotation
     serializer_class = GetallAnnotationsbyUserSerializer
     queryset = Annotation.objects.filter()
+
 

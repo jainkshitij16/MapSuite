@@ -30,8 +30,8 @@ class AnnotationSerializer(serializers.ModelSerializer):
     Contains similar fields with similar properties as the Annotation object found in userprofile.models
     """
 
-    first_name = serializers.ReadOnlyField(source='owner.user.first_name')
-    last_name = serializers.ReadOnlyField(source='owner.user.last_name')
+    #first_name = serializers.ReadOnlyField(source='owner.user.first_name')
+    #last_name = serializers.ReadOnlyField(source='owner.user.last_name')
     username = serializers.ReadOnlyField(source='owner.user.username')
 
     class Meta:
