@@ -20,7 +20,7 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'last_name',
                   'email',
                   'username',
-                  'bio')
+                  'user_bio')
 
 class AnnotationSerializer(serializers.ModelSerializer):
 
