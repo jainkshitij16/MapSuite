@@ -1,16 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
-from django.core import exceptions
-import pytz
-
+from .validators import *
 # Create your models here.
 
-def datevalidator(value):
-    now = timezone.datetime.now()
-    now = pytz.utc.localize(now)
-    if value > now:
-        raise exceptions.ValidationError('Annotation cannot be from a future date')
 
 class Userprofile(models.Model):
 

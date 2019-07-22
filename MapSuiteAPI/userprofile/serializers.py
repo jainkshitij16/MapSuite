@@ -22,7 +22,7 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'username',
                   'bio')
 
-class LocationSerializer(serializers.ModelSerializer):
+class AnnotationSerializer(serializers.ModelSerializer):
 
     """
     A class which is used to represent the serializers for the Annotation object
@@ -42,3 +42,15 @@ class LocationSerializer(serializers.ModelSerializer):
                   'longitude',
                   'ann_text',
                   'ann_date_time')
+
+class GetallAnnotationsbyUserSerializer(serializers.ModelSerializer):
+
+    """
+    A class with is used to represent the serializers to get all annotations for a user
+    Required for transforming data from JSON to native python data types and vice-versa
+    Contains fields from the Annotation model object found in userprofile.models
+    """
+
+    class Meta:
+        model = Annotation
+        fields = '__all__'
