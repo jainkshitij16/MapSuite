@@ -34,6 +34,12 @@ class UserTestClass(APITestCase):
                                              ann_date_time=ann_date_time)
     @classmethod
     def setUpTestData(cls):
-       # cls.user = User.objects.create_superuser(username )
+        cls.user = User.objects.create_superuser(username='test',
+                                                 password='mapsuite')
+
+        user_one = cls.createUser(username='random', password='user1')
+        user_two = cls.createUser(username='random2', password='user2')
+        user_three = cls.createUser(username='random3', password='user3')
+
 
 

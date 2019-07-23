@@ -19,6 +19,7 @@ class Userprofile(models.Model):
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
     user_bio = models.CharField(max_length=180, help_text='Let all the users know something interesting about yourself')
+    groupby = models.CharField(max_length=100, help_text='Categorization field make groups for users', blank=True)
     isdeleted = models.BooleanField(blank=False, default=False, help_text='Admin field only')
 
     def __str__(self):
@@ -58,14 +59,13 @@ class Annotation(models.Model):
             the date and/or time when the annotation was selected to be placed
     """
 
-    #TODO: Make a validator for lat and lon
-
     owner = models.ForeignKey(Userprofile, related_name='location_user', on_delete=models.CASCADE, help_text='The user this annotation belongs too')
     location_name = models.CharField(max_length=30, blank=False, default='location name', help_text='The name of the location of the annotation')
-    latitude = models.DecimalField(decimal_places=4, max_digits=10, blank=False, default=49.2642, help_text='The latitude of the location up to 4 decimal places')
-    longitude = models.DecimalField(decimal_places=4, max_digits=10, blank=False, default=123.2532, help_text='The longitude of the location up to 4 decimal places')
+    latitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[latitudevalidator], blank=False, default=49.2642, help_text='The latitude of the location up to 4 decimal places')
+    longitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[longitudevalidator], blank=False, default=123.2532, help_text='The longitude of the location up to 4 decimal places')
     ann_text = models.CharField(max_length=250, help_text='The desired story you want to tell to all other users')
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
+    ishome = models.BooleanField(default=False, help_text='The tag to identify whether the location is a home or not')
 
     def __str__(self):
         if self.owner.user.first_name != '':
