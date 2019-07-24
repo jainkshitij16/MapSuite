@@ -13,8 +13,14 @@ class Userprofile(models.Model):
         user: User object, foreign key with auth.model User object, maps a one to one relationship
             the user details and the credentials (first_name, last_name, email, username, password)
 
-        user_bio: Character object, max_length = 150 words
+        user_bio: Character field, max_length = 150 words
             the user biography, a representation of what the user is all about
+
+        groupby: Character field, not required, max_length = 100
+            the user grouping field, used to classify various users
+
+        isdeleted: Boolean field, Required (default False)
+            User flag, used to identify if the user has deleted account or not
     """
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
@@ -49,7 +55,7 @@ class Annotation(models.Model):
         longitude: Decimal field, decimal places = 4, max_digits = 10, required (default 123.2532)
             the longitude of the location marked
 
-        ann_text : Character field
+        ann_text : Character field, max_length = 1200
             the desired annotation in the text format on the point of interest
 
         ann_file : file field, yet to the implemented
@@ -57,13 +63,17 @@ class Annotation(models.Model):
 
         ann_date_time : datetime field, required (default time.now)
             the date and/or time when the annotation was selected to be placed
+
+        ishome : Boolean field (default false)
+            A flag to recogonize if this annotation is home for the user
+
     """
 
     owner = models.ForeignKey(Userprofile, related_name='location_user', on_delete=models.CASCADE, help_text='The user this annotation belongs too')
     location_name = models.CharField(max_length=30, blank=False, default='location name', help_text='The name of the location of the annotation')
     latitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[latitudevalidator], blank=False, default=49.2642, help_text='The latitude of the location up to 4 decimal places')
     longitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[longitudevalidator], blank=False, default=123.2532, help_text='The longitude of the location up to 4 decimal places')
-    ann_text = models.CharField(max_length=250, help_text='The desired story you want to tell to all other users')
+    ann_text = models.CharField(max_length=1200, help_text='The desired story you want to tell to all other users')
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ishome = models.BooleanField(default=False, help_text='The tag to identify whether the location is a home or not')
 

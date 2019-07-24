@@ -11,6 +11,9 @@ GET: all locations : admin only
 GET: all annotations by user : authenticated only
 GET: all users which annotated a location : authenticated only
 GET: a single annotation by the user : authenticated only
+GET: all homes marked by the user : authenticated only
+GET: all users in the same category : authenticated only
+GET: A single user : authenticated only
 
 COULD BE COMBINED ENDPOINTS
 

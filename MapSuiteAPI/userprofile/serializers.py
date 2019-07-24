@@ -20,7 +20,8 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'last_name',
                   'email',
                   'username',
-                  'user_bio')
+                  'user_bio',
+                  'groupby')
 
 class AnnotationSerializer(serializers.ModelSerializer):
 
@@ -41,7 +42,8 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'latitude',
                   'longitude',
                   'ann_text',
-                  'ann_date_time')
+                  'ann_date_time',
+                  'ishome',)
 
 class GetallAnnotationsbyUserSerializer(serializers.ModelSerializer):
 
