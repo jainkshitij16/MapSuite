@@ -54,5 +54,5 @@ class GetallAnnotationsbyUserSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = Annotation
+        model = Annotation, Userprofile
         fields = '__all__'

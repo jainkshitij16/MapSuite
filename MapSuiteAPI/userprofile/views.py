@@ -55,7 +55,52 @@ class AllAnnotations(generics.ListCreateAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
+#TODO: Work in progress
+class RetrieveAgent(generics.RetrieveUpdateDestroyAPIView):
 
+    """
+    Returns the selected userprofile/annotation
+
+    :request verb: GET, PUT, PATCH, DELETE
+    :endpoint: http://localhost:8000/<agent>/<pk>
+    :parameter generics.RetrieveUpdateDestroyAPIView : The class that is used to generate the viewsets
+    :return: the desired object of the selected agent with the desired primary key
+    """
+
+    model = Userprofile, Annotation
+    serializer_class = GetallAnnotationsbyUserSerializer
+    queryset = Userprofile.objects.all(), Annotation.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        if self.kwargs['agent'] == 'user':
+            print('TODO, have to complete this')
+
+
+class RetreiveUser(generics.RetrieveAPIView):
+    """
+    Returns the selected user
+
+    Temporary function to return a user
+    """
+
+    model = Userprofile
+    serializer_class = UserprofileSerializer
+    queryset = Userprofile.objects.all()
+
+
+class RetreiveAnnotation(generics.RetrieveAPIView):
+    """
+    Returns the selected annotation
+
+    Temporary function to return a annotation
+    """
+
+    model = Annotation
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
+
+
+#TODO: Work in progress
 class UserwithAnnotations(generics.ListCreateAPIView):
 
     """

@@ -38,7 +38,8 @@ class UserTestClass(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_superuser(username='test',
-                                                 password='mapsuite')
+                                                 password='mapsuite',
+                                                 email='test@mapsuite.tech')
 
         user_one = cls.createUser(username='random', password='user1')
         user_two = cls.createUser(username='random2', password='user2')
@@ -91,8 +92,8 @@ class UserTestClass(APITestCase):
         """
         response = self.client.get(reverse('all-users'))
         expected = Userprofile.objects.all()
-        serialized = UserprofileSerializer(expected)
-        self.assertEqual(response.data['results'], serialized.data)
+        serialized = UserprofileSerializer(expected, many=True)
+        self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -105,11 +106,11 @@ class UserTestClass(APITestCase):
 
         response = self.client.get(reverse('all-annotations'))
         expected = Annotation.objects.all()
-        serialized = AnnotationSerializer(expected)
-        self.assertEqual(response.data['results'], serialized.data)
+        serialized = AnnotationSerializer(expected, many=True)
+        self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def findUser(self, pk =0):
+    def findUser(self, pk=0, agent=''):
 
         """
         Helper function for test_GetOneUser to call the endpoint using the kwargs
@@ -117,7 +118,9 @@ class UserTestClass(APITestCase):
         :return: returns the serialized user object
         """
 
-        print('Complete find user')
+        return self.client.get(reverse('one-agent', kwargs= {
+            'pk':pk,
+            'agent': agent}))
 
     def test_GetOneUser(self):
 
@@ -126,7 +129,11 @@ class UserTestClass(APITestCase):
         :return: the selected user according to the primary key passed
         """
 
-        print('Complete Get one user')
+        response = self.findUser(pk=2, agent='user')
+        expected = Userprofile.objects.get(user_bio='Test case number three')
+        serialized = UserprofileSerializer(expected, many=True)
+        self.assertEqual(response.data['results'], serialized.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def findAnnotation(self, pk=0):
 
