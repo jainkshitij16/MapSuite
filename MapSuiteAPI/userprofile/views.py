@@ -71,9 +71,7 @@ class RetrieveAgent(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GetallAnnotationsbyUserSerializer
     queryset = Userprofile.objects.all(), Annotation.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        if self.kwargs['agent'] == 'user':
-            print('TODO, have to complete this')
+    # Change get queryset
 
 
 class RetreiveUser(generics.RetrieveAPIView):

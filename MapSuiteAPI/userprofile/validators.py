@@ -13,8 +13,10 @@ def datevalidator(value):
 
     now = timezone.datetime.now()
     now = pytz.utc.localize(now)
+    #now = pytz.utc.normalize(now)
+    value = pytz.utc.normalize(value)
     if value > now:
-        raise exceptions.ValidationError('Annotation cannot be from a future date')
+        raise exceptions.ValidationError(value) #Please make sure you do not enter a future date and/or time
 
 def latitudevalidator(value):
 
@@ -24,7 +26,7 @@ def latitudevalidator(value):
     :return: if the value entered is outside the acceptable range, it raises a validation error
     """
 
-    if -90 <= value <= 90:
+    if -90.0000 > value < 90.0000:
         raise exceptions.ValidationError('The acceptable range of latitudes is +-90')
 
 def longitudevalidator(value):
@@ -35,5 +37,5 @@ def longitudevalidator(value):
     :return: if the value entered is outside the acceptable range, it raises a validation error
     """
 
-    if -180 <= value <= 180:
+    if -180.0000 > value < 180.0000:
         raise exceptions.ValidationError('The acceptable range of longitude is +-180')
