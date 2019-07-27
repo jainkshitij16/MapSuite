@@ -6,14 +6,14 @@ from rest_framework import generics
 # Create your views here.
 
 """
-GET: all users : admin only
-GET: all locations : admin only
-GET: all annotations by user : authenticated only
+GET: all users : admin only : done
+GET: all locations : admin only : done
+GET: all annotations by user : authenticated only : done
 GET: all users which annotated a location : authenticated only
 GET: a single annotation by the user : authenticated only
-GET: all homes marked by the user : authenticated only
+GET: all homes marked by the user : authenticated only : done
 GET: all users in the same category : authenticated only
-GET: A single user : authenticated only
+GET: A single user : authenticated only : done
 
 COULD BE COMBINED ENDPOINTS
 
@@ -25,7 +25,7 @@ DELETE: delete the selected user : authenticated only
 DELETE: delete the selected annotation : authenticated only 
 """
 
-class AllUsers(generics.ListCreateAPIView):
+class getAllUsers(generics.ListCreateAPIView):
 
     """
     Returns all the userprofiles
@@ -40,7 +40,7 @@ class AllUsers(generics.ListCreateAPIView):
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
 
-class AllAnnotations(generics.ListCreateAPIView):
+class getAllAnnotations(generics.ListCreateAPIView):
 
     """
     Returns all the annotations
@@ -81,15 +81,15 @@ class RetreiveAnnotation(generics.RetrieveAPIView):
     queryset = Annotation.objects.all()
 
 
-#TODO: Work in progress
-class UserwithAnnotations(generics.ListCreateAPIView):
+
+class getUserAnnotations(generics.ListCreateAPIView):
 
     """
     Returns all the annotations posted by the user
 
     :request : GET
-    :endpoint : http://localhost:8000/user=<username>/annotations
-    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :endpoint : http://localhost:8000/username=<username>/annotations
+    :parameter : generics.ListCreateAPIView : The class that is used to generate the viewsets
     :return : All of the annotations by the selected user (Format: JSON)
     """
 
@@ -98,7 +98,7 @@ class UserwithAnnotations(generics.ListCreateAPIView):
     def get_queryset(self):
 
         """
-        The function overrides the get_queryset method
+        Overrides the get_queryset method
         This view should return a list of all the locations for the current user
 
         :return: list of locations by the request.user
@@ -107,30 +107,52 @@ class UserwithAnnotations(generics.ListCreateAPIView):
         #user = self.request.user Use this post persmissions
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'])
 
-    def get(self, request, *args, **kwargs):
+    # def get(self, request, *args, **kwargs):
+    #     """
+    #     Overrides the default get method
+    #
+    #     :param request:
+    #     :param args:
+    #     :param kwargs:
+    #     :return: a view with the returned queryset items
+    #     """
+    #
+    #     try:
+    #         userprofiles = Userprofile.objects.filter(user__username=self.kwargs['username'])
+    #         annotations = self.get_queryset()
+    #
+    #         userprofiles_serializer = UserprofileSerializer(userprofiles, many=True)
+    #         annotations_serializer = AnnotationSerializer(annotations, many=True)
+    #
+    #         return Response({
+    #             'userprofile': userprofiles_serializer.data,
+    #             'user_annotations' : annotations_serializer.data
+    #         })
+    #
+    #     except:
+    #         return Response(status.HTTP_404_NOT_FOUND)
+
+class getUserHomes(generics.ListCreateAPIView):
+
+    """
+    Returns all the annotations marked as home by the user
+
+    :request: GET
+    :endpoint : http://localhost:8000/username=<username>/annotations/home
+    :parameter : generics.ListCreateAPIView : The class that is used to generate the viewsets
+    :return : All of the annotations by the selected user (Format: JSON)
+    """
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
         """
-        The function overrides the default get method
-
-        :param request:
-        :param args:
-        :param kwargs:
-        :return: a view with the returned queryset items
+        Overrides the default get method to filter for user's home(s)
+        :return: list of the annotations marked as users home
         """
 
-        try:
-            userprofiles = Userprofile.objects.filter(user__username=self.kwargs['username'])
-            annotations = self.get_queryset()
-
-            userprofiles_serializer = UserprofileSerializer(userprofiles, many=True)
-            annotations_serializer = AnnotationSerializer(annotations, many=True)
-
-            return Response({
-                'userprofile': userprofiles_serializer.data,
-                'user_annotations' : annotations_serializer.data
-            })
-
-        except:
-            return Response(status.HTTP_404_NOT_FOUND)
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], ishome=True)
 
 
 
