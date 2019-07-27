@@ -110,7 +110,7 @@ class UserTestClass(APITestCase):
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def findUser(self, pk=0, agent=''):
+    def findUser(self, pk=0):
 
         """
         Helper function for test_GetOneUser to call the endpoint using the kwargs
@@ -118,9 +118,8 @@ class UserTestClass(APITestCase):
         :return: returns the serialized user object
         """
 
-        return self.client.get(reverse('one-agent', kwargs= {
-            'pk':pk,
-            'agent': agent}))
+        return self.client.get(reverse('one-user', kwargs={
+            'pk':pk}))
 
     def test_GetOneUser(self):
 
@@ -129,10 +128,10 @@ class UserTestClass(APITestCase):
         :return: the selected user according to the primary key passed
         """
 
-        response = self.findUser(pk=2, agent='user')
+        response = self.findUser(pk=3)
         expected = Userprofile.objects.get(user_bio='Test case number three')
-        serialized = UserprofileSerializer(expected, many=True)
-        self.assertEqual(response.data['results'], serialized.data)
+        serialized = UserprofileSerializer(expected)
+        self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def findAnnotation(self, pk=0):
@@ -143,7 +142,8 @@ class UserTestClass(APITestCase):
         :return: returns the serialized annotation object
         """
 
-        print('Complete find annotation')
+        return self.client.get(reverse('one-annotation', kwargs={
+            'pk':pk}))
 
     def test_GetOneAnnotation(self):
 
@@ -152,7 +152,11 @@ class UserTestClass(APITestCase):
         :return: the selected annotation according to the primary key passed
         """
 
-        print('Complete get annotation')
+        response = self.findAnnotation(pk=2)
+        expected = Annotation.objects.get(ann_text='Test user ann text number 2')
+        serialized = AnnotationSerializer(expected)
+        self.assertEquals(response.data, serialized.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 

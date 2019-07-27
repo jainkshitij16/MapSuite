@@ -1,6 +1,6 @@
 from .models import Annotation,Userprofile
-from .serializers import UserprofileSerializer, AnnotationSerializer, GetallAnnotationsbyUserSerializer
-# from rest_framework.views import Response, status
+from .serializers import UserprofileSerializer, AnnotationSerializer
+from rest_framework.views import Response, status
 from rest_framework import generics
 
 # Create your views here.
@@ -55,24 +55,7 @@ class AllAnnotations(generics.ListCreateAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
-#TODO: Work in progress
-class RetrieveAgent(generics.RetrieveUpdateDestroyAPIView):
-
-    """
-    Returns the selected userprofile/annotation
-
-    :request verb: GET, PUT, PATCH, DELETE
-    :endpoint: http://localhost:8000/<agent>/<pk>
-    :parameter generics.RetrieveUpdateDestroyAPIView : The class that is used to generate the viewsets
-    :return: the desired object of the selected agent with the desired primary key
-    """
-
-    model = Userprofile, Annotation
-    serializer_class = GetallAnnotationsbyUserSerializer
-    queryset = Userprofile.objects.all(), Annotation.objects.all()
-
     # Change get queryset
-
 
 class RetreiveUser(generics.RetrieveAPIView):
     """
@@ -109,8 +92,46 @@ class UserwithAnnotations(generics.ListCreateAPIView):
     :parameter : generics.ListAPIView : The class that is used to generate the viewsets
     :return : All of the annotations by the selected user (Format: JSON)
     """
-    model = Userprofile, Annotation
-    serializer_class = GetallAnnotationsbyUserSerializer
-    queryset = Annotation.objects.filter()
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
+        """
+        The function overrides the get_queryset method
+        This view should return a list of all the locations for the current user
+
+        :return: list of locations by the request.user
+        """
+
+        #user = self.request.user Use this post persmissions
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'])
+
+    def get(self, request, *args, **kwargs):
+        """
+        The function overrides the default get method
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return: a view with the returned queryset items
+        """
+
+        try:
+            userprofiles = Userprofile.objects.filter(user__username=self.kwargs['username'])
+            annotations = self.get_queryset()
+
+            userprofiles_serializer = UserprofileSerializer(userprofiles, many=True)
+            annotations_serializer = AnnotationSerializer(annotations, many=True)
+
+            return Response({
+                'userprofile': userprofiles_serializer.data,
+                'user_annotations' : annotations_serializer.data
+            })
+
+        except:
+            return Response(status.HTTP_404_NOT_FOUND)
+
+
 
 

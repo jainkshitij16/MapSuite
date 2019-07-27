@@ -16,7 +16,7 @@ def datevalidator(value):
     #now = pytz.utc.normalize(now)
     value = pytz.utc.normalize(value)
     if value > now:
-        raise exceptions.ValidationError(value) #Please make sure you do not enter a future date and/or time
+        raise exceptions.ValidationError('Please make sure you do not enter a future date and/or time')
 
 def latitudevalidator(value):
 

@@ -44,15 +44,3 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'ann_text',
                   'ann_date_time',
                   'ishome',)
-
-class GetallAnnotationsbyUserSerializer(serializers.ModelSerializer):
-
-    """
-    A class with is used to represent the serializers to get all annotations for a user
-    Required for transforming data from JSON to native python data types and vice-versa
-    Contains fields from the Annotation model object found in userprofile.models
-    """
-
-    class Meta:
-        model = Annotation, Userprofile
-        fields = '__all__'
