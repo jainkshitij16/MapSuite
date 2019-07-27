@@ -9,10 +9,10 @@ from rest_framework import generics
 GET: all users : admin only : done
 GET: all locations : admin only : done
 GET: all annotations by user : authenticated only : done
-GET: all users which annotated a location : authenticated only
-GET: a single annotation by the user : authenticated only
+GET: all users which annotated a location : authenticated only : done
+GET: a single annotation by the user : authenticated only : done
 GET: all homes marked by the user : authenticated only : done
-GET: all users in the same category : authenticated only
+GET: all users in the same category : authenticated only : done
 GET: A single user : authenticated only : done
 
 COULD BE COMBINED ENDPOINTS
@@ -55,7 +55,27 @@ class getAllAnnotations(generics.ListCreateAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
-    # Change get queryset
+class getAllUserswithCat(generics.ListAPIView):
+
+    """
+    Returns all of the user which have the same categories
+
+    :request verb: GET
+    :endpoint : http://localhost:8000/usersgroup=<str:group>
+    :parameter generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All of the users in the in the same category (Format: JSON)
+    """
+
+    serializer_class = UserprofileSerializer
+
+    def get_queryset(self):
+
+        """
+        Filters the users with the same group
+        :return: selected users
+        """
+
+        return Userprofile.objects.filter(groupby__contains=self.kwargs['group'])
 
 class RetreiveUser(generics.RetrieveAPIView):
     """
@@ -82,14 +102,14 @@ class RetreiveAnnotation(generics.RetrieveAPIView):
 
 
 
-class getUserAnnotations(generics.ListCreateAPIView):
+class getUserAnnotations(generics.ListAPIView):
 
     """
     Returns all the annotations posted by the user
 
     :request : GET
     :endpoint : http://localhost:8000/username=<username>/annotations
-    :parameter : generics.ListCreateAPIView : The class that is used to generate the viewsets
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
     :return : All of the annotations by the selected user (Format: JSON)
     """
 
@@ -132,14 +152,14 @@ class getUserAnnotations(generics.ListCreateAPIView):
     #     except:
     #         return Response(status.HTTP_404_NOT_FOUND)
 
-class getUserHomes(generics.ListCreateAPIView):
+class getUserHomes(generics.ListAPIView):
 
     """
     Returns all the annotations marked as home by the user
 
     :request: GET
     :endpoint : http://localhost:8000/username=<username>/annotations/home
-    :parameter : generics.ListCreateAPIView : The class that is used to generate the viewsets
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
     :return : All of the annotations by the selected user (Format: JSON)
     """
 
@@ -153,6 +173,95 @@ class getUserHomes(generics.ListCreateAPIView):
         """
 
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'], ishome=True)
+
+class getSingleUserAnnotation(generics.ListAPIView):
+
+    """
+    Returns the requested annotation of the user by the location name keyword
+
+    :request: GET
+    :endpoint : http://localhost:8000/username=<username>/annotations=<keyword>
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :return : Selected annotation(s) of the annotations by the selected user (Format: JSON)
+    """
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
+        """
+        Filter the annotations to find the annotation to contain the keyword for the selected keyword and the usernmae
+        :return: Selected annotations in the queryset of the selected user
+        """
+
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], location_name__icontains=self.kwargs['keyword'])
+
+class getAnnotionfromKeyword(generics.ListAPIView):
+
+    """
+    Returns the requested annotations by the location name keyword
+
+    :request: GET
+    :endpoint : http://localhost:8000/annotations=<keyword>
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :return : Selected annotation(s) of the annotations (Format: JSON)
+    """
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
+        """
+        Filter the annotations to find the annotations that contains the the ket
+        :return: Selected annotations
+        """
+
+        return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword'])
+
+class getAnnotationUsers(generics.ListAPIView):
+
+    """
+    Returns all the users that have annotated the same location
+
+    :request: GET
+    :endpoint : http://localhost:8000/annotations=<keyword>/users
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All the users that have marked the the same location in the annotation (Format: JSON)
+    """
+
+    serializer_class = UserprofileSerializer
+
+    def get_queryset(self):
+
+        """
+        Filter the users to find the users that have marked the same location
+        :return: selected users
+        """
+
+        return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'])
+
+class getAnnotationwithTextKeyword(generics.ListAPIView):
+
+    """
+    Retuns all the annotations where the keyword has been present in the annotation description
+
+    :request: GET
+    :endpoint : http://localhost:8000/annotations/search_text=<keyword>
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All the users that have marked the the same location in the annotation (Format: JSON)
+    """
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
+        """
+        Filters the annotations to find the annotations where the text contains the keyword
+        :return: selected annotations
+        """
+
+        return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword'])
+
 
 
 
