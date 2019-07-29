@@ -44,6 +44,9 @@ class UserTestClass(APITestCase):
         user_one = cls.createUser(username='random', password='user1')
         user_two = cls.createUser(username='random2', password='user2')
         user_three = cls.createUser(username='random3', password='user3')
+        user_four = cls.createUser(username='random4', password='user4')
+        user_five = cls.createUser(username='random5', password='user5')
+        user_six = cls.createUser(username='random6', password='user6')
 
         userprofile_one = cls.createUserProfile(user=user_one,
                                                 user_bio='Test case number one',
@@ -60,6 +63,21 @@ class UserTestClass(APITestCase):
                                                   groupby='UBC',
                                                   isdeleted=False)
 
+        userprofile_four = cls.createUserProfile(user=user_four,
+                                                 user_bio='Test case number four',
+                                                 groupby='Test',
+                                                 isdeleted=False)
+
+        userprofile_five = cls.createUserProfile(user=user_five,
+                                                 user_bio='Test case number five',
+                                                 groupby='Test',
+                                                 isdeleted=False)
+
+        userprofile_six = cls.createUserProfile(user=user_six,
+                                                user_bio='Test case number six',
+                                                groupby='Test',
+                                                isdeleted=False)
+
         cls.createAnnotation(owner=userprofile_one,
                              location_name='Test user location number 1',
                              latitude=88.1234,
@@ -74,7 +92,7 @@ class UserTestClass(APITestCase):
                              longitude=97.2432,
                              ann_text='Test user ann text number 2',
                              ann_date_time=timezone.now(),
-                             ishome=False)
+                             ishome=True)
 
         cls.createAnnotation(owner=userprofile_three,
                              location_name='Test user location number 3',
@@ -84,10 +102,33 @@ class UserTestClass(APITestCase):
                              ann_date_time=timezone.now(),
                              ishome=False)
 
+        cls.createAnnotation(owner=userprofile_four,
+                             location_name='UBC',
+                             latitude=43.5434,
+                             longitude=122.4534,
+                             ann_text='Test user ann text number 4',
+                             ann_date_time=timezone.now(),
+                             ishome=True)
+
+        cls.createAnnotation(owner=userprofile_five,
+                             location_name='Test',
+                             latitude=22.3454,
+                             longitude=120.4356,
+                             ann_text='Test user ann text number 5',
+                             ann_date_time=timezone.now(),
+                             ishome=True)
+
+        cls.createAnnotation(owner=userprofile_six,
+                             location_name='UBC',
+                             latitude=45.1243,
+                             longitude=123.5678,
+                             ann_text='Test user ann text number 4',
+                             ishome=True)
+
     def test_GetAllUsers(self):
 
         """
-        The test is to check GET request at the endpoint
+        The test is to check GET request at the endpoint: http://localhost:8000/users
         :return: all the users that currently present in the database
         """
         response = self.client.get(reverse('all-users'))
@@ -100,7 +141,7 @@ class UserTestClass(APITestCase):
     def test_GetAllAnnotations(self):
 
         """
-        The test is to check the GET request at the endpoint
+        The test is to check the GET request at the endpoint: http://localhost:8000/annotations
         :return: all the annotations currently present in the database
         """
 
@@ -124,7 +165,7 @@ class UserTestClass(APITestCase):
     def test_GetOneUser(self):
 
         """
-        The test is to check the GET request at the endpoint
+        The test is to check the GET request at the endpoint: http://localhost:8000/users/<pk>
         :return: the selected user according to the primary key passed
         """
 
@@ -148,7 +189,7 @@ class UserTestClass(APITestCase):
     def test_GetOneAnnotation(self):
 
         """
-        The test is to check the GET request at the endpoint
+        The test is to check the GET request at the endpoint: http://localhost:8000/annotations/<pk>
         :return: the selected annotation according to the primary key passed
         """
 
@@ -158,7 +199,73 @@ class UserTestClass(APITestCase):
         self.assertEquals(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_GetAnnotationUsers(self):
 
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/annotations=<keyword>/users
+        :return: the users that have annotated the same location
+        """
 
+        #TODO: Need to implement this
+        print('Test get annotation users')
 
+    def test_GetAnnotationsKeyword(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/annotations=<keyword>
+        :return: All of the annotations that contain the keyword in the location name
+        """
+
+        # TODO: Need to implement this
+        print('Test get annotation keyword')
+
+    def test_GetAnnotationsSearch(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/annotations/search_text=<keyword>
+        :return: All of the annotations which contain the keyword in their text description
+        """
+
+        #TODO: Need to implement this
+        print('test get annotations search')
+
+    def test_GetUsersGroup(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/usergroup=<keyword>
+        :return: All of the users which have the same group
+        """
+
+        #TODO: Need to implement this
+        print('test get users with the same category')
+
+    def test_GetUserAnnotations(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/annotations
+        :return: All of the annotations of the user
+        """
+
+        #TODO: Need to implement this
+        print('test to get annotations of the user')
+
+    def test_GetUserHomes(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/homes
+        :return: All of the annotations marked home of the user
+        """
+
+        #TODO: Need to implement this
+        print('test to get annotations marked home of the user')
+
+    def test_GetAnnotationkeywordUser(self):
+
+        """
+        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/annotations=<keyword>
+        :return: All of the annotations of the user where location name contains the keyword
+        """
+
+        #TODO: Need to implement this
+        print('test to get the selected annotation marked by the user')
 

@@ -71,7 +71,7 @@ class getAllUserswithCat(generics.ListAPIView):
     def get_queryset(self):
 
         """
-        Filters the users with the same group
+        Filters the users with the same groupname, looks for the exact match
         :return: selected users
         """
 
@@ -119,7 +119,7 @@ class getUserAnnotations(generics.ListAPIView):
 
         """
         Overrides the get_queryset method
-        This view should return a list of all the locations for the current user
+        This view should return a list of all the locations for the current user, username is the exact match
 
         :return: list of locations by the request.user
         """
@@ -168,7 +168,7 @@ class getUserHomes(generics.ListAPIView):
     def get_queryset(self):
 
         """
-        Overrides the default get method to filter for user's home(s)
+        Overrides the default get method to filter for user's home(s), username is the exact match
         :return: list of the annotations marked as users home
         """
 
@@ -190,7 +190,8 @@ class getSingleUserAnnotation(generics.ListAPIView):
     def get_queryset(self):
 
         """
-        Filter the annotations to find the annotation to contain the keyword for the selected keyword and the usernmae
+        Filter the annotations to find the annotation to contain the keyword for the selected keyword and the username
+        username is the exact match, keyword is not case sensitive
         :return: Selected annotations in the queryset of the selected user
         """
 
@@ -212,7 +213,8 @@ class getAnnotionfromKeyword(generics.ListAPIView):
     def get_queryset(self):
 
         """
-        Filter the annotations to find the annotations that contains the the ket
+        Filter the annotations to find the annotations that contains the the keyword
+        keyword is not case sensitive
         :return: Selected annotations
         """
 
@@ -235,6 +237,7 @@ class getAnnotationUsers(generics.ListAPIView):
 
         """
         Filter the users to find the users that have marked the same location
+        keyword is not case sensitive
         :return: selected users
         """
 
@@ -257,6 +260,7 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
 
         """
         Filters the annotations to find the annotations where the text contains the keyword
+        keyword is not case sensitive
         :return: selected annotations
         """
 
