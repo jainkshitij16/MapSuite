@@ -75,7 +75,7 @@ class getAllUserswithCat(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(groupby__contains=self.kwargs['group'])
+        return Userprofile.objects.filter(groupby__contains=self.kwargs['group'], isdeleted=False)
 
 class RetreiveUser(generics.RetrieveAPIView):
     """
@@ -125,7 +125,7 @@ class getUserAnnotations(generics.ListAPIView):
         """
 
         #user = self.request.user Use this post persmissions
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'])
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], owner__isdeleted=False)
 
     # def get(self, request, *args, **kwargs):
     #     """
@@ -172,7 +172,7 @@ class getUserHomes(generics.ListAPIView):
         :return: list of the annotations marked as users home
         """
 
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], ishome=True)
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], ishome=True, owner__isdeleted=False)
 
 class getSingleUserAnnotation(generics.ListAPIView):
 
@@ -195,7 +195,7 @@ class getSingleUserAnnotation(generics.ListAPIView):
         :return: Selected annotations in the queryset of the selected user
         """
 
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], location_name__icontains=self.kwargs['keyword'])
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], location_name__icontains=self.kwargs['keyword'], owner__isdeleted=False)
 
 class getAnnotionfromKeyword(generics.ListAPIView):
 
@@ -218,7 +218,7 @@ class getAnnotionfromKeyword(generics.ListAPIView):
         :return: Selected annotations
         """
 
-        return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword'])
+        return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword']) # do we delete the annotation if user is deleted
 
 class getAnnotationUsers(generics.ListAPIView):
 
@@ -241,7 +241,7 @@ class getAnnotationUsers(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'])
+        return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'], isdeleted=False)
 
 class getAnnotationwithTextKeyword(generics.ListAPIView):
 
@@ -264,7 +264,7 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
         :return: selected annotations
         """
 
-        return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword'])
+        return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword']) # do we delete the annotation if user is deleted
 
 
 

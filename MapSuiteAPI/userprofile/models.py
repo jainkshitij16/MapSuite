@@ -65,9 +65,17 @@ class Annotation(models.Model):
             the date and/or time when the annotation was selected to be placed
 
         ishome : Boolean field (default false)
-            A flag to recogonize if this annotation is home for the user
+            A flag to recogonize if this annotation is home for the user # choice field is also an option
 
     """
+
+    #Represent the various labels the users could have
+    TAG_CHOICES = (
+        ('H', 'Home'),
+        ('O', 'Office'),
+        (),
+        #('Cus', 'Custom'),
+    )
 
     owner = models.ForeignKey(Userprofile, related_name='location_user', on_delete=models.CASCADE, help_text='The user this annotation belongs too')
     location_name = models.CharField(max_length=30, blank=False, default='location name', help_text='The name of the location of the annotation')
@@ -75,6 +83,7 @@ class Annotation(models.Model):
     longitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[longitudevalidator], blank=False, default=123.2532, help_text='The longitude of the location up to 4 decimal places')
     ann_text = models.CharField(max_length=1200, help_text='The desired story you want to tell to all other users')
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
+    ann_file = models.FileField(blank=True)
     ishome = models.BooleanField(default=False, help_text='The tag to identify whether the location is a home or not')
 
     def __str__(self):
