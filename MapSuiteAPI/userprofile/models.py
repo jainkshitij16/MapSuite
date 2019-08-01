@@ -3,29 +3,6 @@ from django.contrib.auth.models import User
 from .validators import *
 # Create your models here.
 
-class Community(models.Model):
-
-    """
-    A class which represents the community groups
-
-    Attributes:
-
-    community_name : Char field, max length = 30 characters, unique in nature
-        name of the community created by the user
-
-    private_community : Boolean field, required (default False)
-        whether the community of users is private or public
-    """
-
-    community_name = models.CharField(unique=True, max_length=30, help_text='The name of the community the users belong to')
-    private_community = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.community_name
-
-    class Meta:
-        verbose_name_plural = 'communities'
-
 
 class Userprofile(models.Model):
 
@@ -36,10 +13,10 @@ class Userprofile(models.Model):
         user: User object, foreign key with auth.model User object, maps a one to one relationship
             the user details and the credentials (first_name, last_name, email, username, password)
 
-        user_bio: Character field, max_length = 150 words
+        user_bio: Character field, max_length = 180
             the user biography, a representation of what the user is all about
 
-        community: Community Object, foreign key with community, maps a many to one relationship
+        community: Character field, max_length = 50
             the user grouping field, used to classify various users
 
         private: Boolean field, Required (default False)
@@ -51,7 +28,7 @@ class Userprofile(models.Model):
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
     user_bio = models.CharField(max_length=180, help_text='Let all the users know something interesting about yourself')
-    community = models.ForeignKey(Community, on_delete=models.CASCADE, help_text='The community user belongs too', default='')
+    community = models.CharField(max_length=50, blank=True, help_text='What is the community that you represent')
     private = models.BooleanField(default=False, help_text='Would you like your profile to be accessible by everyone?')
     isdeleted = models.BooleanField(blank=False, default=False, help_text='Admin field only')
 
@@ -59,35 +36,6 @@ class Userprofile(models.Model):
         if self.user.first_name != '':
             return self.user.first_name
         return self.user.username
-
-
-class Story(models.Model):
-
-    """
-    A class which represents the annotation groups
-
-    Attributes:
-
-    story_name : Char field, max_length = 30 characters, unique in nature
-        name of the story which holds all of the relevant annotations
-
-    story_owner : Userprofile owner, foreign key object, maps a one to many relationship
-        the user who has created the story
-
-    private_story : taken from the settings of the story_owner field
-        Whether the story is private or not
-    """
-
-    story_name = models.CharField(unique=True, max_length=30, help_text='The name of the story')
-    story_owner = models.ForeignKey(Userprofile, on_delete=models.CASCADE, help_text='the owner of the story', default='')
-    private_story = models.BooleanField(default=False, help_text='Is the story private or not')
-
-    def __str__(self):
-        return self.story_name
-
-    class Meta:
-        verbose_name_plural = 'stories'
-
 
 class Annotation(models.Model):
 
@@ -118,7 +66,13 @@ class Annotation(models.Model):
             the date and/or time when the annotation was selected to be placed
 
         label : Char field, presents choices of the tags, max length = 20
-            A tag to recogonize if this annotation is part of any tag_choice
+            a tag to recogonize if this annotation is part of any tag_choice
+
+        story : Char field, classify annotations into a story, max_length = 50
+            the annotation grouping field, used to classify various annotations
+
+        story_privacy : Boolean field, Required (default False)
+            user flag, used to identify the privacy settings of the stories
 
     """
 
@@ -140,7 +94,9 @@ class Annotation(models.Model):
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ann_file = models.FileField(blank=True)
     label = models.CharField(choices=TAG_CHOICES, help_text='The tag to identify whether the annotation represents any category', max_length=20, blank=True)
-    stories = models.ForeignKey(Story, on_delete=models.CASCADE, help_text='The annotations that are part of the story', default='')
+    story = models.CharField(max_length=50, blank=True, help_text='The story name for the group of annotations')
+    story_privacy = models.BooleanField(default=False, help_text='Is the story visible to everyone or just community members')
+
 
 
     def __str__(self):

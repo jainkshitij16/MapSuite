@@ -14,6 +14,7 @@ GET: a single annotation by the user : authenticated only : done
 GET: all homes marked by the user : authenticated only : done
 GET: all users in the same category : authenticated only : done
 GET: A single user : authenticated only : done
+GET: all annotations posted according to the category : authenticated, within that cat :
 
 COULD BE COMBINED ENDPOINTS
 
