@@ -21,7 +21,8 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'email',
                   'username',
                   'user_bio',
-                  'groupby')
+                  'community',
+                  'private')
 
 class AnnotationSerializer(serializers.ModelSerializer):
 
@@ -43,4 +44,6 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'longitude',
                   'ann_text',
                   'ann_date_time',
-                  'ishome',)
+                  'label',
+                  'ann_file',
+                  'stories')

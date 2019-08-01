@@ -19,11 +19,13 @@ COULD BE COMBINED ENDPOINTS
 
 POST: Create a new user : everyone
 POST: Create a new annotation : authenticated only
-PATCH: Update the user : authenticated only
-PATCH: Update the annotation : authenticated only
-DELETE: delete the selected user : authenticated only
-DELETE: delete the selected annotation : authenticated only 
+PATCH: Update the user : authenticated only, owner only
+PATCH: Update the annotation : authenticated only, owner only
+DELETE: delete the selected user : authenticated only, owner only
+DELETE: delete the selected annotation : authenticated only , owner only
 """
+
+#_____________USER ENDPOINTS___________________________________
 
 class getAllUsers(generics.ListCreateAPIView):
 
@@ -39,21 +41,6 @@ class getAllUsers(generics.ListCreateAPIView):
     model = Userprofile
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
-
-class getAllAnnotations(generics.ListCreateAPIView):
-
-    """
-    Returns all the annotations
-
-    :request verb: GET, POST
-    :endpoint : http://localhost:8000/annotations
-    :parameter generics.ListAPIView : The class that is used to generate the viewsets
-    :return : All of the users in the database (Format: JSON)
-    """
-
-    model = Annotation
-    serializer_class = AnnotationSerializer
-    queryset = Annotation.objects.all()
 
 class getAllUserswithCat(generics.ListAPIView):
 
@@ -75,7 +62,9 @@ class getAllUserswithCat(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(groupby__contains=self.kwargs['group'], isdeleted=False)
+        return Userprofile.objects.filter(groupby=self.kwargs['group'],
+                                          isdeleted=False,
+                                          private=False)
 
 class RetreiveUser(generics.RetrieveAPIView):
     """
@@ -87,20 +76,6 @@ class RetreiveUser(generics.RetrieveAPIView):
     model = Userprofile
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
-
-
-class RetreiveAnnotation(generics.RetrieveAPIView):
-    """
-    Returns the selected annotation
-
-    Temporary function to return a annotation
-    """
-
-    model = Annotation
-    serializer_class = AnnotationSerializer
-    queryset = Annotation.objects.all()
-
-
 
 class getUserAnnotations(generics.ListAPIView):
 
@@ -125,32 +100,8 @@ class getUserAnnotations(generics.ListAPIView):
         """
 
         #user = self.request.user Use this post persmissions
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], owner__isdeleted=False)
-
-    # def get(self, request, *args, **kwargs):
-    #     """
-    #     Overrides the default get method
-    #
-    #     :param request:
-    #     :param args:
-    #     :param kwargs:
-    #     :return: a view with the returned queryset items
-    #     """
-    #
-    #     try:
-    #         userprofiles = Userprofile.objects.filter(user__username=self.kwargs['username'])
-    #         annotations = self.get_queryset()
-    #
-    #         userprofiles_serializer = UserprofileSerializer(userprofiles, many=True)
-    #         annotations_serializer = AnnotationSerializer(annotations, many=True)
-    #
-    #         return Response({
-    #             'userprofile': userprofiles_serializer.data,
-    #             'user_annotations' : annotations_serializer.data
-    #         })
-    #
-    #     except:
-    #         return Response(status.HTTP_404_NOT_FOUND)
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
+                                         owner__isdeleted=False)
 
 class getUserHomes(generics.ListAPIView):
 
@@ -172,7 +123,9 @@ class getUserHomes(generics.ListAPIView):
         :return: list of the annotations marked as users home
         """
 
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], ishome=True, owner__isdeleted=False)
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
+                                         ishome=True,
+                                         owner__isdeleted=False)
 
 class getSingleUserAnnotation(generics.ListAPIView):
 
@@ -195,7 +148,37 @@ class getSingleUserAnnotation(generics.ListAPIView):
         :return: Selected annotations in the queryset of the selected user
         """
 
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'], location_name__icontains=self.kwargs['keyword'], owner__isdeleted=False)
+        return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
+                                         location_name__icontains=self.kwargs['keyword'],
+                                         owner__isdeleted=False)
+
+#_______________ANNOTATION ENDPOINTS____________________________________
+
+class getAllAnnotations(generics.ListCreateAPIView):
+
+    """
+    Returns all the annotations
+
+    :request verb: GET, POST
+    :endpoint : http://localhost:8000/annotations
+    :parameter generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All of the users in the database (Format: JSON)
+    """
+
+    model = Annotation
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
+
+class RetreiveAnnotation(generics.RetrieveAPIView):
+    """
+    Returns the selected annotation
+
+    Temporary function to return a annotation
+    """
+
+    model = Annotation
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
 
 class getAnnotionfromKeyword(generics.ListAPIView):
 
@@ -241,7 +224,8 @@ class getAnnotationUsers(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'], isdeleted=False)
+        return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'],
+                                          isdeleted=False)
 
 class getAnnotationwithTextKeyword(generics.ListAPIView):
 
