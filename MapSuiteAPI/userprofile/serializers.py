@@ -46,4 +46,4 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'ann_date_time',
                   'label',
                   'ann_file',
-                  'stories')
+                  'annotation_privacy')

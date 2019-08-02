@@ -1,9 +1,12 @@
 from .models import Annotation,Userprofile
 from .serializers import UserprofileSerializer, AnnotationSerializer
+from .decorators import *
 from rest_framework.views import Response, status
-from rest_framework import generics
+from rest_framework import generics, permissions
 
 # Create your views here.
+
+#TODO: add if case cases for when the request user is the owner->should also return private annotations, otherwise not
 
 """
 GET: all users : admin only : done
@@ -26,14 +29,62 @@ DELETE: delete the selected user : authenticated only, owner only
 DELETE: delete the selected annotation : authenticated only , owner only
 """
 
-#_____________USER ENDPOINTS___________________________________
+#______________POST ENDPOINTS_____________________________________
+
+class RegisterUser(generics.CreateAPIView):
+
+    """
+    Creates a new user
+
+    :request verb: POST
+    :endpoint : http://localhost:8000/user
+    :parameter : The class that is used to generate the viewsets
+    :return : Status 201
+    """
+
+    @validate_user_request_data
+    def post(self, request, *args, **kwargs):
+        print("Blah")
+
+
+class RegisterProfile(generics.CreateAPIView):
+
+    """
+    Creates a new userpofile
+
+    :request verb: POST
+    :endpoint : http://localhost:8000/profile
+    :parameter : The class that is used to generate the viewsets
+    return : Status 201
+    """
+
+    @validate_profile_request_data
+    def post(self, request, *args, **kwargs):
+        print("Blah")
+
+class RegisterAnnotation(generics.CreateAPIView):
+
+    """
+    Creates a new annotation
+
+    :request verb: POST
+    :endpoint : http://localhost:8000/annotation
+    :parameter : The class that is used to generate the viewsets
+    return : Status 201
+    """
+
+    @validate_annotation_request_data
+    def post(self, request, *args, **kwargs):
+        print("Blah")
+
+#_____________USER GET ENDPOINTS___________________________________
 
 class getAllUsers(generics.ListCreateAPIView):
 
     """
     Returns all the userprofiles
 
-    :request verb: GET, POST
+    :request verb: GET
     :endpoint : http://localhost:8000/users
     :parameter generics.ListAPIView : The class that is used to generate the viewsets
     :return : All of the userprofiles in the database (Format: JSON)
@@ -42,16 +93,17 @@ class getAllUsers(generics.ListCreateAPIView):
     model = Userprofile
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
+    #permission_classes = (permissions.IsAdminUser)
 
-class getAllUserswithCat(generics.ListAPIView):
+class getAllUserswithCom(generics.ListAPIView):
 
     """
-    Returns all of the user which have the same categories
+    Returns all of the user which have the same community
 
     :request verb: GET
-    :endpoint : http://localhost:8000/usersgroup=<str:group>
+    :endpoint : http://localhost:8000/usersgroup=<str:community>
     :parameter generics.ListAPIView : The class that is used to generate the viewsets
-    :return : All of the users in the in the same category (Format: JSON)
+    :return : All of the users in the in the same community (Format: JSON)
     """
 
     serializer_class = UserprofileSerializer
@@ -63,7 +115,7 @@ class getAllUserswithCat(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(groupby=self.kwargs['group'],
+        return Userprofile.objects.filter(community=self.kwargs['community'],
                                           isdeleted=False,
                                           private=False)
 
@@ -104,15 +156,15 @@ class getUserAnnotations(generics.ListAPIView):
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
                                          owner__isdeleted=False)
 
-class getUserHomes(generics.ListAPIView):
+class getUserLabel(generics.ListAPIView):
 
     """
     Returns all the annotations marked as home by the user
 
     :request: GET
-    :endpoint : http://localhost:8000/username=<username>/annotations/home
+    :endpoint : http://localhost:8000/username=<username>/label=<str:label>
     :parameter : generics.ListAPIView : The class that is used to generate the viewsets
-    :return : All of the annotations by the selected user (Format: JSON)
+    :return : All of the annotations marked as <label> by the selected user (Format: JSON)
     """
 
     serializer_class = AnnotationSerializer
@@ -125,7 +177,7 @@ class getUserHomes(generics.ListAPIView):
         """
 
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
-                                         ishome=True,
+                                         label=self.kwargs['label'],
                                          owner__isdeleted=False)
 
 class getSingleUserAnnotation(generics.ListAPIView):
@@ -153,17 +205,17 @@ class getSingleUserAnnotation(generics.ListAPIView):
                                          location_name__icontains=self.kwargs['keyword'],
                                          owner__isdeleted=False)
 
-#_______________ANNOTATION ENDPOINTS____________________________________
+#_______________ANNOTATION GET ENDPOINTS____________________________________
 
 class getAllAnnotations(generics.ListCreateAPIView):
 
     """
     Returns all the annotations
 
-    :request verb: GET, POST
+    :request verb: GET
     :endpoint : http://localhost:8000/annotations
     :parameter generics.ListAPIView : The class that is used to generate the viewsets
-    :return : All of the users in the database (Format: JSON)
+    :return : All of the annotations in the database (Format: JSON)
     """
 
     model = Annotation
@@ -202,7 +254,8 @@ class getAnnotionfromKeyword(generics.ListAPIView):
         :return: Selected annotations
         """
 
-        return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword']) # do we delete the annotation if user is deleted
+        return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword'],
+                                         owner__isdeleted=False)
 
 class getAnnotationUsers(generics.ListAPIView):
 
@@ -236,7 +289,7 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
     :request: GET
     :endpoint : http://localhost:8000/annotations/search_text=<keyword>
     :parameter : generics.ListAPIView : The class that is used to generate the viewsets
-    :return : All the users that have marked the the same location in the annotation (Format: JSON)
+    :return : All the annotations that have a hit from the keyword (Format: JSON)
     """
 
     serializer_class = AnnotationSerializer
@@ -249,8 +302,32 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
         :return: selected annotations
         """
 
-        return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword']) # do we delete the annotation if user is deleted
+        return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword'],
+                                         owner__isdeleted=False)
 
+class getAnnotationsofCommunity(generics.ListAPIView):
+
+    """
+    Returns all the annotations for the specified community for members otherwise all public
+
+    :request: GET
+    :endpoint : http://localhost:8000/annotations/usergroup=<community>
+    :parameter : generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All the annotations for members of the community and public annotations for non members
+    """
+
+    serializer_class = AnnotationSerializer
+
+    def get_queryset(self):
+
+        """
+        Filters the annotations to find the annotations present in the selected community
+        :return: selected annotations
+        """
+
+        return Annotation.objects.filter(owner__community=self.kwargs['community'],
+                                         owner__isdeleted=False,
+                                         annotation_privacy=False)
 
 
 

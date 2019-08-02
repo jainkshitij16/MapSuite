@@ -28,7 +28,7 @@ class Userprofile(models.Model):
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
     user_bio = models.CharField(max_length=180, help_text='Let all the users know something interesting about yourself')
-    community = models.CharField(max_length=50, blank=True, help_text='What is the community that you represent')
+    community = models.CharField(max_length=50, blank=True, null=True, help_text='What is the community that you represent')
     private = models.BooleanField(default=False, help_text='Would you like your profile to be accessible by everyone?')
     isdeleted = models.BooleanField(blank=False, default=False, help_text='Admin field only')
 
@@ -94,8 +94,7 @@ class Annotation(models.Model):
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ann_file = models.FileField(blank=True)
     label = models.CharField(choices=TAG_CHOICES, help_text='The tag to identify whether the annotation represents any category', max_length=20, blank=True)
-    story = models.CharField(max_length=50, blank=True, help_text='The story name for the group of annotations')
-    story_privacy = models.BooleanField(default=False, help_text='Is the story visible to everyone or just community members')
+    annotation_privacy = models.BooleanField(default=False, help_text='Is the annotation private or not')
 
 
 

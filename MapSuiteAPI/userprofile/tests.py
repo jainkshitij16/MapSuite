@@ -18,16 +18,23 @@ class UserTestClass(APITestCase):
                                        password=password)
 
     @staticmethod
-    def createUserProfile(user= User, user_bio='', groupby='', private=False , isdeleted=False):
-        if user is not None and user_bio !='' and groupby !='' and isdeleted is not None and private is not None:
+    def createUserProfile(user= User, user_bio='', private=False , isdeleted=False, community=''):
+        if user is not None and user_bio !='' and isdeleted is not None and private is not None:
             return Userprofile.objects.create(user=user,
                                               user_bio=user_bio,
-                                              groupby=groupby,
                                               private=private,
+                                              community=community,
                                               isdeleted=isdeleted)
 
     @staticmethod
-    def createAnnotation(owner=Userprofile, location_name='', latitude=-1.00, longitude=-1.00, ann_text='', ann_date_time='', label='home'):
+    def createAnnotation(owner=Userprofile,
+                         location_name='',
+                         latitude=-1.00,
+                         longitude=-1.00,
+                         ann_text='',
+                         ann_date_time='',
+                         label='home',
+                         annotation_privacy=False):
         if owner is not None and location_name != '' and latitude !=-1 and longitude !=-1 and ann_text !='' and ann_date_time is not None:
             return Annotation.objects.create(owner=owner,
                                              location_name=location_name,
@@ -35,7 +42,8 @@ class UserTestClass(APITestCase):
                                              longitude=longitude,
                                              ann_text=ann_text,
                                              ann_date_time=ann_date_time,
-                                             label=label)
+                                             label=label,
+                                             annotation_privacy=annotation_privacy)
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_superuser(username='test',
@@ -51,36 +59,37 @@ class UserTestClass(APITestCase):
 
         userprofile_one = cls.createUserProfile(user=user_one,
                                                 user_bio='Test case number one',
-                                                groupby='blah',
+                                                community='Test',
+                                                private=True,
                                                 isdeleted=False)
 
         userprofile_two = cls.createUserProfile(user=user_two,
                                                 user_bio='Test case number two',
-                                                groupby='blah',
+                                                community='UBC',
                                                 private=False,
                                                 isdeleted=False)
 
         userprofile_three = cls.createUserProfile(user=user_three,
                                                   user_bio='Test case number three',
-                                                  groupby='UBC',
+                                                  community='UBC',
                                                   private=True,
                                                   isdeleted=False)
 
         userprofile_four = cls.createUserProfile(user=user_four,
                                                  user_bio='Test case number four',
-                                                 groupby='Test',
+                                                 community='Test',
                                                  private=False,
                                                  isdeleted=False)
 
         userprofile_five = cls.createUserProfile(user=user_five,
                                                  user_bio='Test case number five',
-                                                 groupby='Test',
+                                                 community='Test',
                                                  private=True,
                                                  isdeleted=False)
 
         userprofile_six = cls.createUserProfile(user=user_six,
                                                 user_bio='Test case number six',
-                                                groupby='Test',
+                                                community='Test',
                                                 private=False,
                                                 isdeleted=False)
 
@@ -90,7 +99,8 @@ class UserTestClass(APITestCase):
                              longitude=122.4356,
                              ann_text='Test user ann text number 1',
                              ann_date_time=timezone.now(),
-                             label='Custom')
+                             label='Custom',
+                             annotation_privacy=False)
 
         cls.createAnnotation(owner=userprofile_two,
                              location_name='Test user location number 2',
@@ -98,7 +108,8 @@ class UserTestClass(APITestCase):
                              longitude=97.2432,
                              ann_text='Test user ann text number 2',
                              ann_date_time=timezone.now(),
-                             label='Home')
+                             label='Home',
+                             annotation_privacy=True)
 
         cls.createAnnotation(owner=userprofile_three,
                              location_name='Test user location number 3',
@@ -106,7 +117,8 @@ class UserTestClass(APITestCase):
                              longitude=175.2432,
                              ann_text='Test user ann text number 3',
                              ann_date_time=timezone.now(),
-                             label='Office')
+                             label='Office',
+                             annotation_privacy=False)
 
         cls.createAnnotation(owner=userprofile_four,
                              location_name='UBC',
@@ -114,7 +126,8 @@ class UserTestClass(APITestCase):
                              longitude=122.4534,
                              ann_text='Test user ann text number 4',
                              ann_date_time=timezone.now(),
-                             label='Research')
+                             label='Research',
+                             annotation_privacy=False)
 
         cls.createAnnotation(owner=userprofile_five,
                              location_name='Test',
@@ -122,7 +135,8 @@ class UserTestClass(APITestCase):
                              longitude=120.4356,
                              ann_text='Test user ann text number 5',
                              ann_date_time=timezone.now(),
-                             label='Attraction')
+                             label='Attraction',
+                             annotation_privacy=False)
 
         cls.createAnnotation(owner=userprofile_six,
                              location_name='UBC',
@@ -130,7 +144,8 @@ class UserTestClass(APITestCase):
                              longitude=123.5678,
                              ann_text='Test user ann text number 4',
                              ann_date_time=timezone.now(),
-                             label='Home')
+                             label='Home',
+                             annotation_privacy=False)
 
     def test_GetAllUsers(self):
 
