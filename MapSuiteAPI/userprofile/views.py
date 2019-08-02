@@ -1,5 +1,5 @@
-from .models import Annotation,Userprofile
-from .serializers import UserprofileSerializer, AnnotationSerializer
+from .models import Annotation,Userprofile, User
+from .serializers import UserprofileSerializer, AnnotationSerializer, UserSerializer
 from .decorators import *
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
@@ -44,7 +44,39 @@ class RegisterUser(generics.CreateAPIView):
 
     @validate_user_request_data
     def post(self, request, *args, **kwargs):
-        print("Blah")
+
+        """
+        Creates a new user
+
+        :param request: A request sent with data
+        :param args:
+        :param kwargs:
+        :return: staus 201 on success
+        """
+        username = request.data.get('username','')
+        password = request.data.get('password','')
+        email = request.data.get('email','')
+        first_name = request.data.get('first_name','')
+        last_name = request.data.get('last_name','')
+
+        if first_name is not None and last_name is not None:
+            new_user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+        else:
+            new_user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email
+            )
+        return Response(
+            data= UserSerializer(new_user).data,
+            status= status.HTTP_201_CREATED
+        )
 
 
 class RegisterProfile(generics.CreateAPIView):

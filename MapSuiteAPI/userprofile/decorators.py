@@ -7,14 +7,15 @@ def validate_user_request_data(fn):
         username = args[0].request.data.get('username','')
         password = args[0].request.data.get('password','')
         email = args[0].request.data.get('email','')
-        first_name = args[0].request.data.get('first_name','')
-        last_name = args[0].request.data.get('last_name', '')
 
         if not username and not password and not email:
             return Response(
-
+                data= {
+                    'Error' : 'Username, password and email are required'
+                },
+                status= status.HTTP_400_BAD_REQUEST
             )
-
+        return fn(*args,**kwargs)
     return user_decorator
 
 def validate_profile_request_data(fn):

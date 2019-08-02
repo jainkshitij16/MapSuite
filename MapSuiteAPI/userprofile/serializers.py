@@ -1,4 +1,4 @@
-from .models import Userprofile, Annotation
+from .models import Userprofile, Annotation, User
 from rest_framework import serializers
 
 class UserprofileSerializer(serializers.ModelSerializer):
@@ -23,6 +23,22 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'user_bio',
                   'community',
                   'private')
+
+class UserSerializer(serializers.ModelSerializer):
+
+    """
+    A class which is used to represent the serializers for the User object
+    Required for transforming data from JSON to native python data types and vice-versa
+    Contains similar fields with similar properties as the user object found in auth.user
+    """
+
+    class Meta:
+        model = User
+        fields = ('username',
+                  'password',
+                  'email',
+                  'first_name',
+                  'last_name')
 
 class AnnotationSerializer(serializers.ModelSerializer):
 
