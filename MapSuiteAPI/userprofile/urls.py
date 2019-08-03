@@ -12,7 +12,6 @@ urlpatterns = [
     path('username=<str:username>/annotations',views.getUserAnnotations.as_view(), name='user-annotations'),
 
     path('user', views.RegisterUser.as_view(), name='create-user'),
-    path('profile', views.RegisterProfile.as_view(), name='create-profile'),
     path('annotation', views.RegisterAnnotation.as_view(), name='create-annotation'),
 
     path('annotations/<int:pk>', views.RetreiveAnnotation.as_view(), name='one-annotation'),
@@ -21,6 +20,7 @@ urlpatterns = [
     path('annotations/search_text=<str:keyword>', views.getAnnotationwithTextKeyword.as_view(), name='intext-annotations'),
     path('annotations/usergroup=<str:community>', views.getAnnotationsofCommunity.as_view(), name='com-annotations'),
     path('annotations', views.getAllAnnotations.as_view(), name='all-annotations'),
+    path('test', views.getcomm.as_view()) #TODO: update this
 
 
     #path('<str:agent>/<int:pk>', views.RetrieveAgent.as_view(), name='one-agent'),

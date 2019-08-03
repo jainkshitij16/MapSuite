@@ -1,6 +1,6 @@
-from .models import Annotation,Userprofile, User
-from .serializers import UserprofileSerializer, AnnotationSerializer, UserSerializer
-from .decorators import *
+from .models import Annotation,Userprofile, User, Community
+from .serializers import UserprofileSerializer, AnnotationSerializer, UserSerializer, CommunitySerializer
+from .decorators import validate_user_request_data, validate_annotation_request_data
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 
@@ -41,7 +41,7 @@ class RegisterUser(generics.CreateAPIView):
     :parameter : The class that is used to generate the viewsets
     :return : Status 201
     """
-
+    #TODO: Complete the password validation thingy
     @validate_user_request_data
     def post(self, request, *args, **kwargs):
 
@@ -53,11 +53,12 @@ class RegisterUser(generics.CreateAPIView):
         :param kwargs:
         :return: staus 201 on success
         """
-        username = request.data.get('username','')
-        password = request.data.get('password','')
-        email = request.data.get('email','')
-        first_name = request.data.get('first_name','')
-        last_name = request.data.get('last_name','')
+        username = request.data.get('username')
+        password = request.data.get('password')
+        email = request.data.get('email')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        #TODO: Complete the userprofile sign up fields
 
         if first_name is not None and last_name is not None:
             new_user = User.objects.create_user(
@@ -78,22 +79,6 @@ class RegisterUser(generics.CreateAPIView):
             status= status.HTTP_201_CREATED
         )
 
-
-class RegisterProfile(generics.CreateAPIView):
-
-    """
-    Creates a new userpofile
-
-    :request verb: POST
-    :endpoint : http://localhost:8000/profile
-    :parameter : The class that is used to generate the viewsets
-    return : Status 201
-    """
-
-    @validate_profile_request_data
-    def post(self, request, *args, **kwargs):
-        print("Blah")
-
 class RegisterAnnotation(generics.CreateAPIView):
 
     """
@@ -110,6 +95,20 @@ class RegisterAnnotation(generics.CreateAPIView):
         print("Blah")
 
 #_____________USER GET ENDPOINTS___________________________________
+
+class getcomm(generics.ListAPIView):
+    """
+    Returns all the communities
+
+    :request verb: GET
+    :endpoint : http://localhost:8000/communities
+    :parameter generics.ListAPIView : The class that is used to generate the viewsets
+    :return : All of the communities in the database (Format: JSON)
+    """
+
+    model = Community
+    serializer_class = CommunitySerializer
+    queryset = Community.objects.all()
 
 class getAllUsers(generics.ListCreateAPIView):
 

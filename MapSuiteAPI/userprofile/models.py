@@ -3,6 +3,22 @@ from django.contrib.auth.models import User
 from .validators import *
 # Create your models here.
 
+class Community(models.Model):
+
+    """
+    A class which represents the community object
+
+    Attributes:
+        community_name : Character field, max_length : 50
+    """
+
+    community_name = models.CharField(max_length=50,unique=True, null=True, help_text='The name of the community needs to be unique')
+
+    def __str__(self):
+        return self.community_name
+
+    class Meta:
+        verbose_name_plural= 'communities'
 
 class Userprofile(models.Model):
 
@@ -28,7 +44,7 @@ class Userprofile(models.Model):
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
     user_bio = models.CharField(max_length=180, help_text='Let all the users know something interesting about yourself')
-    community = models.CharField(max_length=50, blank=True, null=True, help_text='What is the community that you represent')
+    community_user = models.ManyToManyField(Community, blank=True)
     private = models.BooleanField(default=False, help_text='Would you like your profile to be accessible by everyone?')
     isdeleted = models.BooleanField(blank=False, default=False, help_text='Admin field only')
 
@@ -68,7 +84,7 @@ class Annotation(models.Model):
         label : Char field, presents choices of the tags, max length = 20
             a tag to recogonize if this annotation is part of any tag_choice
 
-        story : Char field, classify annotations into a story, max_length = 50
+        community_annotation : Community Object, classify if the annotation belongs to the community, many to many
             the annotation grouping field, used to classify various annotations
 
         story_privacy : Boolean field, Required (default False)
@@ -77,6 +93,7 @@ class Annotation(models.Model):
     """
 
     #Represent the various labels the users could have
+    #TODO: Delete the choices option and convert to text field, make the according changes as well
     TAG_CHOICES = (
         ('home', 'Home'),
         ('office', 'Office'),
@@ -94,6 +111,7 @@ class Annotation(models.Model):
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ann_file = models.FileField(blank=True)
     label = models.CharField(choices=TAG_CHOICES, help_text='The tag to identify whether the annotation represents any category', max_length=20, blank=True)
+    community_annotation = models.ManyToManyField(Community, blank=True)
     annotation_privacy = models.BooleanField(default=False, help_text='Is the annotation private or not')
 
 
@@ -102,7 +120,6 @@ class Annotation(models.Model):
         if self.owner.user.first_name != '':
             return '{}-{}'.format(self.location_name, self.owner.user.first_name)
         return '{}-{}'.format(self.location_name, self.owner.user.username)
-
 
 
 

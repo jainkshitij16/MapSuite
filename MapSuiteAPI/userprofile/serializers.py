@@ -1,5 +1,18 @@
-from .models import Userprofile, Annotation, User
+from .models import Userprofile, Annotation, User, Community
 from rest_framework import serializers
+
+
+class CommunitySerializer(serializers.ModelSerializer):
+
+    """
+    A class which is used to represent the serializers for the Community object
+    Required for transforming data from JSON to native python data types and vice-versa
+    Contains similar fields with similar properties as the community object found in userprofile.models
+    """
+
+    class Meta:
+        model = Community
+        fields = ('community_name',)
 
 class UserprofileSerializer(serializers.ModelSerializer):
 
@@ -13,6 +26,8 @@ class UserprofileSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source='user.last_name')
     email = serializers.ReadOnlyField(source='user.email')
     username = serializers.ReadOnlyField(source='user.username')
+    community = CommunitySerializer(source='community_user',many=True)
+
 
     class Meta:
         model = Userprofile
@@ -48,9 +63,8 @@ class AnnotationSerializer(serializers.ModelSerializer):
     Contains similar fields with similar properties as the Annotation object found in userprofile.models
     """
 
-    #first_name = serializers.ReadOnlyField(source='owner.user.first_name')
-    #last_name = serializers.ReadOnlyField(source='owner.user.last_name')
     username = serializers.ReadOnlyField(source='owner.user.username')
+    community = CommunitySerializer(many=True, source='community_annotation')
 
     class Meta:
         model = Annotation
@@ -62,4 +76,5 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'ann_date_time',
                   'label',
                   'ann_file',
+                  'community',
                   'annotation_privacy')
