@@ -26,7 +26,7 @@ class UserprofileSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source='user.last_name')
     email = serializers.ReadOnlyField(source='user.email')
     username = serializers.ReadOnlyField(source='user.username')
-    community = CommunitySerializer(source='community_user',many=True)
+    community = CommunitySerializer(source='user_community',many=True)
 
 
     class Meta:
@@ -37,7 +37,7 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'username',
                   'user_bio',
                   'community',
-                  'private')
+                  'user_privacy')
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -64,7 +64,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
     """
 
     username = serializers.ReadOnlyField(source='owner.user.username')
-    community = CommunitySerializer(many=True, source='community_annotation')
+    community = CommunitySerializer(many=True, source='annotation_community')
 
     class Meta:
         model = Annotation

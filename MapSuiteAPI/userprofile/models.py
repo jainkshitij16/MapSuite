@@ -44,8 +44,8 @@ class Userprofile(models.Model):
 
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='userprofile', default='')
     user_bio = models.CharField(max_length=180, help_text='Let all the users know something interesting about yourself')
-    community_user = models.ManyToManyField(Community, blank=True)
-    private = models.BooleanField(default=False, help_text='Would you like your profile to be accessible by everyone?')
+    user_community = models.ManyToManyField(Community, blank=True)
+    user_privacy = models.BooleanField(default=False, help_text='Would you like your profile to be accessible by everyone?')
     isdeleted = models.BooleanField(blank=False, default=False, help_text='Admin field only')
 
     def __str__(self):
@@ -81,8 +81,8 @@ class Annotation(models.Model):
         ann_date_time : datetime field, required (default time.now)
             the date and/or time when the annotation was selected to be placed
 
-        label : Char field, presents choices of the tags, max length = 20
-            a tag to recogonize if this annotation is part of any tag_choice
+        label : Text field, max_length = 10
+            assigns a tag to the annotation
 
         community_annotation : Community Object, classify if the annotation belongs to the community, many to many
             the annotation grouping field, used to classify various annotations
@@ -92,17 +92,6 @@ class Annotation(models.Model):
 
     """
 
-    #Represent the various labels the users could have
-    #TODO: Delete the choices option and convert to text field, make the according changes as well
-    TAG_CHOICES = (
-        ('home', 'Home'),
-        ('office', 'Office'),
-        ('research', 'Research'),
-        ('school','School'),
-        ('attraction','Attraction'),
-        ('custom', 'Custom'),
-    )
-
     owner = models.ForeignKey(Userprofile, related_name='location_user', on_delete=models.CASCADE, help_text='The user this annotation belongs too')
     location_name = models.CharField(max_length=30, blank=False, default='location name', help_text='The name of the location of the annotation')
     latitude = models.DecimalField(decimal_places=4, max_digits=10, validators=[latitudevalidator], blank=False, default=49.2642, help_text='The latitude of the location up to 4 decimal places')
@@ -110,8 +99,8 @@ class Annotation(models.Model):
     ann_text = models.CharField(max_length=1200, help_text='The desired story you want to tell to all other users')
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ann_file = models.FileField(blank=True)
-    label = models.CharField(choices=TAG_CHOICES, help_text='The tag to identify whether the annotation represents any category', max_length=20, blank=True)
-    community_annotation = models.ManyToManyField(Community, blank=True)
+    label = models.TextField(help_text='The tag to identify whether the annotation represents any category', blank=True)
+    annotation_community = models.ManyToManyField(Community, blank=True)
     annotation_privacy = models.BooleanField(default=False, help_text='Is the annotation private or not')
 
 

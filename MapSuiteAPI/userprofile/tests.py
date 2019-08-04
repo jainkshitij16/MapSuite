@@ -18,12 +18,11 @@ class UserTestClass(APITestCase):
                                        password=password)
 
     @staticmethod
-    def createUserProfile(user= User, user_bio='', private=False , isdeleted=False, community=''):
+    def createUserProfile(user= User, user_bio='', private=False , isdeleted=False):
         if user is not None and user_bio !='' and isdeleted is not None and private is not None:
             return Userprofile.objects.create(user=user,
                                               user_bio=user_bio,
                                               private=private,
-                                              community=community,
                                               isdeleted=isdeleted)
 
     @staticmethod
@@ -59,37 +58,31 @@ class UserTestClass(APITestCase):
 
         userprofile_one = cls.createUserProfile(user=user_one,
                                                 user_bio='Test case number one',
-                                                community='Test',
                                                 private=True,
                                                 isdeleted=False)
 
         userprofile_two = cls.createUserProfile(user=user_two,
                                                 user_bio='Test case number two',
-                                                community='UBC',
                                                 private=False,
                                                 isdeleted=False)
 
         userprofile_three = cls.createUserProfile(user=user_three,
                                                   user_bio='Test case number three',
-                                                  community='UBC',
                                                   private=True,
                                                   isdeleted=False)
 
         userprofile_four = cls.createUserProfile(user=user_four,
                                                  user_bio='Test case number four',
-                                                 community='Test',
                                                  private=False,
                                                  isdeleted=False)
 
         userprofile_five = cls.createUserProfile(user=user_five,
                                                  user_bio='Test case number five',
-                                                 community='Test',
                                                  private=True,
                                                  isdeleted=False)
 
         userprofile_six = cls.createUserProfile(user=user_six,
                                                 user_bio='Test case number six',
-                                                community='Test',
                                                 private=False,
                                                 isdeleted=False)
 
@@ -220,74 +213,3 @@ class UserTestClass(APITestCase):
         serialized = AnnotationSerializer(expected)
         self.assertEquals(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_GetAnnotationUsers(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/annotations=<keyword>/users
-        :return: the users that have annotated the same location
-        """
-
-        #TODO: Need to implement this
-        print('Test get annotation users')
-
-    def test_GetAnnotationsKeyword(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/annotations=<keyword>
-        :return: All of the annotations that contain the keyword in the location name
-        """
-
-        # TODO: Need to implement this
-        print('Test get annotation keyword')
-
-    def test_GetAnnotationsSearch(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/annotations/search_text=<keyword>
-        :return: All of the annotations which contain the keyword in their text description
-        """
-
-        #TODO: Need to implement this
-        print('test get annotations search')
-
-    def test_GetUsersGroup(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/usergroup=<keyword>
-        :return: All of the users which have the same group
-        """
-
-        #TODO: Need to implement this
-        print('test get users with the same category')
-
-    def test_GetUserAnnotations(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/annotations
-        :return: All of the annotations of the user
-        """
-
-        #TODO: Need to implement this
-        print('test to get annotations of the user')
-
-    def test_GetUserHomes(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/homes
-        :return: All of the annotations marked home of the user
-        """
-
-        #TODO: Need to implement this
-        print('test to get annotations marked home of the user')
-
-    def test_GetAnnotationkeywordUser(self):
-
-        """
-        This test is to check the GET request at the endpoint: http://localhost:8000/username=<username>/annotations=<keyword>
-        :return: All of the annotations of the user where location name contains the keyword
-        """
-
-        #TODO: Need to implement this
-        print('test to get the selected annotation marked by the user')
-

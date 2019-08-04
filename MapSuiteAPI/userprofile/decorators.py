@@ -1,20 +1,33 @@
 from rest_framework.response import Response
 from rest_framework.views import status
+from django.contrib.auth.password_validation import validate_password, password_validators_help_texts
+from django.core.validators import validate_email, ValidationError
+from .models import User
+from .validators import latitudevalidator, longitudevalidator
 
 def validate_user_request_data(fn):
     def user_decorator(*args, **kwargs):
         username = args[0].request.data.get('username')
         password = args[0].request.data.get('password')
         email = args[0].request.data.get('email')
-        private = args[0].request.data.get('private')
+        user_privacy = args[0].request.data.get('user_privacy')
 
-        if None in (username, password, email, private):
+        if None in (username, password, email, user_privacy):
             return Response(
                 data= {
                     'Error':'Username, password, email and privacy settings are required'
                 },
                 status= status.HTTP_400_BAD_REQUEST
             )
+        try:
+            validate_email(email)
+        except:
+            raise ValidationError('Please check your email')
+        try:
+            validate_password(password,user=User(username=username,
+                                                 email=email))
+        except:
+            raise ValidationError(password_validators_help_texts())
         return fn(*args,**kwargs)
     return user_decorator
 

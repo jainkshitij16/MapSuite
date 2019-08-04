@@ -20,11 +20,8 @@ urlpatterns = [
     path('annotations/search_text=<str:keyword>', views.getAnnotationwithTextKeyword.as_view(), name='intext-annotations'),
     path('annotations/usergroup=<str:community>', views.getAnnotationsofCommunity.as_view(), name='com-annotations'),
     path('annotations', views.getAllAnnotations.as_view(), name='all-annotations'),
-    path('test', views.getcomm.as_view()) #TODO: update this
 
-
-    #path('<str:agent>/<int:pk>', views.RetrieveAgent.as_view(), name='one-agent'),
-    #path('') path for the filtered annotations
+    path('communities', views.getcomm.as_view())
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

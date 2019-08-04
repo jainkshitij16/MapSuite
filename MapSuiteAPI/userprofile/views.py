@@ -4,6 +4,7 @@ from .decorators import validate_user_request_data, validate_annotation_request_
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 
+
 # Create your views here.
 
 #TODO: add if case cases for when the request user is the owner->should also return private annotations, otherwise not
@@ -41,7 +42,7 @@ class RegisterUser(generics.CreateAPIView):
     :parameter : The class that is used to generate the viewsets
     :return : Status 201
     """
-    #TODO: Complete the password validation thingy
+
     @validate_user_request_data
     def post(self, request, *args, **kwargs):
 
@@ -58,7 +59,8 @@ class RegisterUser(generics.CreateAPIView):
         email = request.data.get('email')
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
-        #TODO: Complete the userprofile sign up fields
+        user_bio = request.data.get('user_bio')
+        user_privacy = request.data.get('user_privacy')
 
         if first_name is not None and last_name is not None:
             new_user = User.objects.create_user(
@@ -74,8 +76,11 @@ class RegisterUser(generics.CreateAPIView):
                 password=password,
                 email=email
             )
+        new_userprofile = Userprofile.objects.create(user=new_user,
+                                                     user_bio=user_bio,
+                                                     user_privacy=user_privacy)
         return Response(
-            data= UserSerializer(new_user).data,
+            data= UserprofileSerializer(new_userprofile).data,
             status= status.HTTP_201_CREATED
         )
 
@@ -89,7 +94,7 @@ class RegisterAnnotation(generics.CreateAPIView):
     :parameter : The class that is used to generate the viewsets
     return : Status 201
     """
-
+    #TODO: Complete annotation post and the validation
     @validate_annotation_request_data
     def post(self, request, *args, **kwargs):
         print("Blah")
