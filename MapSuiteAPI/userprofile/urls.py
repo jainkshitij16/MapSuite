@@ -11,8 +11,8 @@ urlpatterns = [
     path('username=<str:username>/label=<str:label>',views.getUserLabel.as_view(), name='user-label'),
     path('username=<str:username>/annotations',views.getUserAnnotations.as_view(), name='user-annotations'),
 
-    path('user', views.RegisterUser.as_view(), name='create-user'),
-    path('annotation', views.RegisterAnnotation.as_view(), name='create-annotation'),
+    path('register_user', views.RegisterUser.as_view(), name='create-user'),
+    path('add_annotation', views.RegisterAnnotation.as_view(), name='create-annotation'),
 
     path('annotations/<int:pk>', views.RetreiveAnnotation.as_view(), name='one-annotation'),
     path('annotations=<str:keyword>/users', views.getAnnotationUsers.as_view(), name='annotation-users'),
@@ -21,7 +21,8 @@ urlpatterns = [
     path('annotations/usergroup=<str:community>', views.getAnnotationsofCommunity.as_view(), name='com-annotations'),
     path('annotations', views.getAllAnnotations.as_view(), name='all-annotations'),
 
-    path('communities', views.getcomm.as_view())
+    path('add_community', views.RegisterCommunity.as_view(), name='create-community'),
+    path('communities', views.getcomm.as_view(), name='communities-all')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

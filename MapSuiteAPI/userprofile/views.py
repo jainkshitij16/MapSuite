@@ -1,6 +1,6 @@
 from .models import Annotation,Userprofile, User, Community
-from .serializers import UserprofileSerializer, AnnotationSerializer, UserSerializer, CommunitySerializer
-from .decorators import validate_user_request_data, validate_annotation_request_data
+from .serializers import UserprofileSerializer, AnnotationSerializer, CommunitySerializer
+from .decorators import validate_user_request_data, validate_annotation_request_data, validate_community_request_data
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 
@@ -22,13 +22,18 @@ GET: all annotations posted according to the category : authenticated, within th
 
 COULD BE COMBINED ENDPOINTS
 
-POST: Create a new user : everyone
-POST: Create a new annotation : authenticated only
-PATCH: Update the user : authenticated only, owner only
-PATCH: Update the annotation : authenticated only, owner only
-DELETE: delete the selected user : authenticated only, owner only
-DELETE: delete the selected annotation : authenticated only , owner only
+POST: login view that issues a token : everyone
+POST: Create a new user : everyone : done
+POST: Create a new annotation : authenticated only : done
+PATCH: Update the user : admin only, owner only
+PATCH: Update the annotation : admin only, owner only
+DELETE: delete the selected user : admin only, owner only
+DELETE: delete the selected annotation : admin only, owner only
 """
+
+#TODO: Add support for adding communities when creating a new a user, annotation
+#TODO:  Validate if the community is not ''
+#TODO: Add suport for adding a file through the front end
 
 #______________POST ENDPOINTS_____________________________________
 
@@ -38,9 +43,9 @@ class RegisterUser(generics.CreateAPIView):
     Creates a new user
 
     :request verb: POST
-    :endpoint : http://localhost:8000/user
+    :endpoint : http://localhost:8000/register_user
     :parameter : The class that is used to generate the viewsets
-    :return : Status 201
+    :return : Status 201, the created userprofile object
     """
 
     @validate_user_request_data
@@ -62,23 +67,26 @@ class RegisterUser(generics.CreateAPIView):
         user_bio = request.data.get('user_bio')
         user_privacy = request.data.get('user_privacy')
 
-        if first_name is not None and last_name is not None:
+        if None in (first_name, last_name):
+            new_user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email)
+        else:
             new_user = User.objects.create_user(
                 username=username,
                 password=password,
                 email=email,
                 first_name=first_name,
-                last_name=last_name
-            )
+                last_name=last_name)
+
+        if user_bio is None:
+            new_userprofile = Userprofile.objects.create(user_bio=new_user,
+                                                         user_privacy=user_privacy)
         else:
-            new_user = User.objects.create_user(
-                username=username,
-                password=password,
-                email=email
-            )
-        new_userprofile = Userprofile.objects.create(user=new_user,
-                                                     user_bio=user_bio,
-                                                     user_privacy=user_privacy)
+            new_userprofile = Userprofile.objects.create(user=new_user,
+                                                         user_bio=user_bio,
+                                                         user_privacy=user_privacy)
         return Response(
             data= UserprofileSerializer(new_userprofile).data,
             status= status.HTTP_201_CREATED
@@ -90,14 +98,41 @@ class RegisterAnnotation(generics.CreateAPIView):
     Creates a new annotation
 
     :request verb: POST
-    :endpoint : http://localhost:8000/annotation
+    :endpoint : http://localhost:8000/add_annotation
     :parameter : The class that is used to generate the viewsets
-    return : Status 201
+    return : Status 201, the created annotation
     """
-    #TODO: Complete annotation post and the validation
+
     @validate_annotation_request_data
     def post(self, request, *args, **kwargs):
-        print("Blah")
+        username= request.data.get('username')
+        location_name= request.data.get('location_name')
+        latitude= request.data.get('latitude')
+        longitude= request.data.get('longitude')
+        ann_text = request.data.get('ann_text')
+        ann_date_time = request.data.get('ann_date_time')
+        label = request.data.get('label')
+        annotation_privacy = request.data.get('annotation_privacy')
+
+
+class RegisterCommunity(generics.CreateAPIView):
+
+    """
+    Creates a new community
+
+    :request verb: POST
+    :endpoint : http://localhost:8000/add_community
+    :parameter : The class that is used to generate the viewsets
+    :return : status 201, the created community
+    """
+
+    @validate_community_request_data
+    def post(self, request, *args, **kwargs):
+        community_name = request.data.get('community_name')
+        return Response(
+            data=CommunitySerializer(Community.objects.create(community_name=community_name)).data,
+            status=status.HTTP_201_CREATED
+        )
 
 #_____________USER GET ENDPOINTS___________________________________
 
@@ -195,7 +230,7 @@ class getUserAnnotations(generics.ListAPIView):
 class getUserLabel(generics.ListAPIView):
 
     """
-    Returns all the annotations marked as home by the user
+    Returns all the annotations marked as label by the user
 
     :request: GET
     :endpoint : http://localhost:8000/username=<username>/label=<str:label>
