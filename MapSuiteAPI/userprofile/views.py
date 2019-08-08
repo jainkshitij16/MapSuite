@@ -4,10 +4,9 @@ from .decorators import validate_user_request_data, validate_annotation_request_
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 
-
 # Create your views here.
 
-#TODO: add if case cases for when the request user is the owner->should also return private annotations, otherwise not
+#TODO: add if case cases for when the request user is the owner->should also return private annotations, otherwise not (permissions, is owner)
 
 """
 GET: all users : admin only : done
@@ -34,6 +33,7 @@ DELETE: delete the selected annotation : admin only, owner only
 #TODO: Add support for adding communities when creating a new a user, annotation
 #TODO:  Validate if the community is not ''
 #TODO: Add suport for adding a file through the front end
+#TODO: Add JWT Support
 
 #______________POST ENDPOINTS_____________________________________
 
@@ -66,6 +66,7 @@ class RegisterUser(generics.CreateAPIView):
         last_name = request.data.get('last_name')
         user_bio = request.data.get('user_bio')
         user_privacy = request.data.get('user_privacy')
+        user_community = request.data.get('user_community')
 
         if None in (first_name, last_name):
             new_user = User.objects.create_user(
@@ -80,7 +81,7 @@ class RegisterUser(generics.CreateAPIView):
                 first_name=first_name,
                 last_name=last_name)
 
-        if user_bio is None:
+        if None in (user_bio, user_community):
             new_userprofile = Userprofile.objects.create(user_bio=new_user,
                                                          user_privacy=user_privacy)
         else:
@@ -113,7 +114,37 @@ class RegisterAnnotation(generics.CreateAPIView):
         ann_date_time = request.data.get('ann_date_time')
         label = request.data.get('label')
         annotation_privacy = request.data.get('annotation_privacy')
+        annotation_community = request.data.get('annotation_community')
 
+        try:
+            owner = Userprofile.objects.get(user__username__iexact=username)
+        except:
+            return Response(
+                data={
+                    'Error' : 'It seems the user does not exist, could you make sure you create a annotation with a valid user'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        new_annotation = Annotation.objects.create(owner=owner,
+                                                   location_name=location_name,
+                                                   latitude=latitude,
+                                                   longitude=longitude,)
+        if ann_text is not None:
+            new_annotation.ann_text=ann_text
+
+        if ann_date_time is not None:
+            new_annotation.ann_date_time=ann_date_time
+
+        if label is not None:
+            new_annotation.label=label
+
+        if annotation_privacy is not None:
+            new_annotation.annotation_privacy=annotation_privacy
+
+        return Response(
+            data=AnnotationSerializer(new_annotation).data,
+            status=status.HTTP_201_CREATED
+        )
 
 class RegisterCommunity(generics.CreateAPIView):
 
@@ -133,6 +164,19 @@ class RegisterCommunity(generics.CreateAPIView):
             data=CommunitySerializer(Community.objects.create(community_name=community_name)).data,
             status=status.HTTP_201_CREATED
         )
+
+class JoinCommunity(generics.UpdateAPIView):
+
+    """
+    Adds the selected lists of communities to the userprofile
+
+    :request verb: PATCH
+    :endpoint : http://localhost:8000/join_community
+    :parameter : The class that is used to generate the viewsets
+    :return : status 201, the updated userprofile
+    """
+
+    #TODO: Complete this
 
 #_____________USER GET ENDPOINTS___________________________________
 

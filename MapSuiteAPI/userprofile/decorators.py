@@ -64,7 +64,7 @@ def validate_annotation_request_data(fn):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            longitudevalidator(float(int(longitude)))
+            longitudevalidator(float(longitude))
         except:
             return Response(
                 data={
@@ -73,7 +73,7 @@ def validate_annotation_request_data(fn):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            latitudevalidator(float(int(latitude)))
+            latitudevalidator(float(latitude))
         except:
             return Response(
                 data={
