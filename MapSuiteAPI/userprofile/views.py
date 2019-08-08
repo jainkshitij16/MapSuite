@@ -6,7 +6,7 @@ from rest_framework import generics, permissions
 
 # Create your views here.
 
-#TODO: add if case cases for when the request user is the owner->should also return private annotations, otherwise not (permissions, is owner)
+#TODO: Add if cases when user_privacy does not matter(custom permissions, is owner and/or current user)
 
 """
 GET: all users : admin only : done
@@ -17,7 +17,7 @@ GET: a single annotation by the user : authenticated only : done
 GET: all homes marked by the user : authenticated only : done
 GET: all users in the same category : authenticated only : done
 GET: A single user : authenticated only : done
-GET: all annotations posted according to the category : authenticated, within that cat :
+GET: all annotations posted according to the category : authenticated, within that cat : 
 
 COULD BE COMBINED ENDPOINTS
 
@@ -30,8 +30,7 @@ DELETE: delete the selected user : admin only, owner only
 DELETE: delete the selected annotation : admin only, owner only
 """
 
-#TODO: Add support for adding communities when creating a new a user, annotation
-#TODO:  Validate if the community is not ''
+#TODO: remove try catch from join_community and put them in a decorator
 #TODO: Add suport for adding a file through the front end
 #TODO: Add JWT Support
 
@@ -114,6 +113,7 @@ class RegisterAnnotation(generics.CreateAPIView):
         ann_date_time = request.data.get('ann_date_time')
         label = request.data.get('label')
         annotation_privacy = request.data.get('annotation_privacy')
+        #TODO: This could be a field that just enters the name of the community, if found connects otherwise error
         annotation_community = request.data.get('annotation_community')
 
         try:
@@ -159,24 +159,138 @@ class RegisterCommunity(generics.CreateAPIView):
 
     @validate_community_request_data
     def post(self, request, *args, **kwargs):
+
         community_name = request.data.get('community_name')
         return Response(
             data=CommunitySerializer(Community.objects.create(community_name=community_name)).data,
             status=status.HTTP_201_CREATED
         )
 
-class JoinCommunity(generics.UpdateAPIView):
+class Change(generics.RetrieveUpdateDestroyAPIView):
 
     """
     Adds the selected lists of communities to the userprofile
 
-    :request verb: PATCH
-    :endpoint : http://localhost:8000/join_community
+    :request verb: GET, PATCH, DELETE
+    :endpoint : http://localhost:8000/model/join_communities/pk
     :parameter : The class that is used to generate the viewsets
     :return : status 201, the updated userprofile
     """
 
-    #TODO: Complete this
+    serializer_class = Userprofile
+
+    def get_queryset(self):
+
+        """
+        Method to get the selected object from the correct model objects
+        :return: the object(through pk) of the desired model
+        """
+
+        pk=self.kwargs['pk']
+        if self.kwargs['model'] == 'userprofile':
+            return Userprofile.objects.get(pk=pk)
+
+        else:
+            return Annotation.objects.get(pk=pk)
+
+    def get(self, request, *args, **kwargs):
+
+        """
+        Overrides the default functionality to manage different models
+
+        :param request: the request and
+        :param args:
+        :param kwargs:
+        :return: Returns the retrieved object with the accurate view and status 200
+        """
+
+        model = kwargs['model']
+        if model=='userprofile':
+            try:
+                userprofile = self.get_queryset()
+                userprofile_serialize = UserprofileSerializer(userprofile)
+                return Response({
+                    'Userprofile':userprofile_serialize.data
+                },
+                    status=status.HTTP_200_OK)
+            except Userprofile.DoesNotExist:
+                return Response(
+                    data={
+                        'Error': 'The userprofile has not been found, are you sure you are looking for the correct object'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        elif model=='annotation':
+            try:
+                annotation = self.get_queryset()
+                annotation_serialize = AnnotationSerializer(annotation)
+                return Response({
+                    'Annotation':annotation_serialize.data
+                },
+                    status=status.HTTP_200_OK)
+            except:
+                return Response(
+                    data={
+                        'Error': 'The annotation has not been found, are you sure you are looking for the correct object'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+    def patch(self, request, *args, **kwargs):
+
+        """
+        Verb that updates the required model with the the updates
+
+        :param request: Contains the JSON object of what is to be updated with what
+        :param args:
+        :param kwargs:
+        :return: The updated model with the status 2XX
+        """
+
+        #TODO: Finish this and test the function
+
+    def delete(self, request, *args, **kwargs):
+
+        """
+        Verb that makes the user inaccessible to any data that has stored, either of the user or other users
+        however for annotations, deletes the annotation from the database, DOES NOT for userprofile
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return: the updated model with the required status
+        """
+
+        model=kwargs['model']
+        pk=kwargs['pk']
+        if model=='userprofile':
+            try:
+                userprofile = Userprofile.objects.get(pk=pk)
+            except:
+                return Response(
+                    data={
+                        'Error':'Userprofile not found, make sure the user exist'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            userprofile.isdeleted = True
+            userprofile.save()
+            return Response(
+                data=UserprofileSerializer(userprofile).data,
+                status=status.HTTP_200_OK
+            )
+        elif model=='annotation':
+            try:
+                annotation = Annotation.objects.get(pk=pk)
+            except:
+                return Response(
+                    data={
+                        'Error':'Annotation not found, make sure the annotation exist'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            annotation.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 #_____________USER GET ENDPOINTS___________________________________
 
@@ -210,6 +324,7 @@ class getAllUsers(generics.ListCreateAPIView):
     queryset = Userprofile.objects.all()
     #permission_classes = (permissions.IsAdminUser)
 
+#TODO: Talk to ernesto about this endpoint and whether this is admin
 class getAllUserswithCom(generics.ListAPIView):
 
     """
@@ -233,17 +348,6 @@ class getAllUserswithCom(generics.ListAPIView):
         return Userprofile.objects.filter(community=self.kwargs['community'],
                                           isdeleted=False,
                                           private=False)
-
-class RetreiveUser(generics.RetrieveAPIView):
-    """
-    Returns the selected user
-
-    Temporary function to return a user
-    """
-
-    model = Userprofile
-    serializer_class = UserprofileSerializer
-    queryset = Userprofile.objects.all()
 
 class getUserAnnotations(generics.ListAPIView):
 
@@ -269,7 +373,8 @@ class getUserAnnotations(generics.ListAPIView):
 
         #user = self.request.user Use this post persmissions
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
-                                         owner__isdeleted=False)
+                                         owner__isdeleted=False,
+                                         owner__user_privacy=False)
 
 class getUserLabel(generics.ListAPIView):
 
@@ -293,7 +398,8 @@ class getUserLabel(generics.ListAPIView):
 
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
                                          label=self.kwargs['label'],
-                                         owner__isdeleted=False)
+                                         owner__isdeleted=False,
+                                         owner__user_privacy=False)
 
 class getSingleUserAnnotation(generics.ListAPIView):
 
@@ -318,7 +424,8 @@ class getSingleUserAnnotation(generics.ListAPIView):
 
         return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
                                          location_name__icontains=self.kwargs['keyword'],
-                                         owner__isdeleted=False)
+                                         owner__isdeleted=False,
+                                         owner__user_privacy=False)
 
 #_______________ANNOTATION GET ENDPOINTS____________________________________
 
@@ -331,17 +438,6 @@ class getAllAnnotations(generics.ListCreateAPIView):
     :endpoint : http://localhost:8000/annotations
     :parameter generics.ListAPIView : The class that is used to generate the viewsets
     :return : All of the annotations in the database (Format: JSON)
-    """
-
-    model = Annotation
-    serializer_class = AnnotationSerializer
-    queryset = Annotation.objects.all()
-
-class RetreiveAnnotation(generics.RetrieveAPIView):
-    """
-    Returns the selected annotation
-
-    Temporary function to return a annotation
     """
 
     model = Annotation
@@ -370,7 +466,8 @@ class getAnnotionfromKeyword(generics.ListAPIView):
         """
 
         return Annotation.objects.filter(location_name__icontains=self.kwargs['keyword'],
-                                         owner__isdeleted=False)
+                                         owner__isdeleted=False,
+                                         owner__user_privacy=False)
 
 class getAnnotationUsers(generics.ListAPIView):
 
@@ -394,7 +491,8 @@ class getAnnotationUsers(generics.ListAPIView):
         """
 
         return Userprofile.objects.filter(location_user__location_name__icontains=self.kwargs['keyword'],
-                                          isdeleted=False)
+                                          isdeleted=False,
+                                          user_privacy=False)
 
 class getAnnotationwithTextKeyword(generics.ListAPIView):
 
@@ -418,7 +516,8 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
         """
 
         return Annotation.objects.filter(ann_text__icontains=self.kwargs['keyword'],
-                                         owner__isdeleted=False)
+                                         owner__isdeleted=False,
+                                         owner__user_privacy=False)
 
 class getAnnotationsofCommunity(generics.ListAPIView):
 
@@ -442,6 +541,7 @@ class getAnnotationsofCommunity(generics.ListAPIView):
 
         return Annotation.objects.filter(owner__community=self.kwargs['community'],
                                          owner__isdeleted=False,
+                                         owner__user_privacy=False,
                                          annotation_privacy=False)
 
 

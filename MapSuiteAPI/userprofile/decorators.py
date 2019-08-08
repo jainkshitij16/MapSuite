@@ -95,5 +95,12 @@ def validate_community_request_data(fn):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+        elif community_name == '':
+            return Response(
+                data={
+                    'Error': 'The community name cannot be blank'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+            )
         return fn(*args,**kwargs)
     return community_decorator

@@ -102,7 +102,7 @@ class Annotation(models.Model):
     label = models.TextField(help_text='The tag to identify whether the annotation represents any category', blank=True)
     annotation_community = models.ManyToManyField(Community, blank=True)
     annotation_privacy = models.BooleanField(default=False, help_text='Is the annotation private or not')
-    # Question about this field, better implementation if user is private then just keep all annotations private except for community members
+    #TODO: Question about this field, better implementation if user is private then just keep all annotations private except for community members
 
 
 
