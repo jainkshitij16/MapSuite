@@ -14,7 +14,7 @@ urlpatterns = [
     path('add_annotation', views.RegisterAnnotation.as_view(), name='create-annotation'),
 
     path('annotations=<str:keyword>/users', views.getAnnotationUsers.as_view(), name='annotation-users'),
-    path('annotations=<str:keyword>', views.getAnnotionfromKeyword.as_view(), name='keyword-annotation'),
+    path('annotations/search_location_name=<str:keyword>', views.getAnnotionfromKeyword.as_view(), name='keyword-annotation'),
     path('annotations/search_text=<str:keyword>', views.getAnnotationwithTextKeyword.as_view(), name='intext-annotations'),
     path('annotations/usergroup=<str:community>', views.getAnnotationsofCommunity.as_view(), name='com-annotations'),
     path('annotations', views.getAllAnnotations.as_view(), name='all-annotations'),

@@ -27,7 +27,7 @@ class RegisterUser(generics.CreateAPIView):
 
     @validate_user_request_data
     def post(self, request, *args, **kwargs):
-        #TODO; Fix this as well
+
         """
         Creates a new user
 
@@ -97,6 +97,35 @@ class JoinCommunity(generics.UpdateAPIView):
         user_community=request.data.get('user_community')
         username=kwargs['username']
 
+        try:
+            userprofile=Userprofile.objects.get(user__username__exact=username)
+        except:
+            return Response(data={
+                'Error':'Could not get the userprofile to add the community too'
+            },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        communities = []
+        if  Community.objects.filter(userprofile__user__username=username):
+            prior_communities=Community.objects.get(userprofile__user__username=username)
+            communities.append(prior_communities)
+
+        for community in user_community:
+            try:
+                community_id=Community.objects.get(community_name=community)
+            except:
+                return Response(data={
+                    'Error':'It seems you are adding a community that does not exist'
+                },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            communities.append(community_id)
+
+        userprofile.user_community.set(communities)
+        userprofile.save()
+        return Response(
+            data=UserprofileSerializer(userprofile).data,
+            status=status.HTTP_200_OK)
 
 class LoginView(generics.CreateAPIView):
 
@@ -152,7 +181,7 @@ class RegisterAnnotation(generics.CreateAPIView):
         ann_date_time = request.data.get('ann_date_time')
         label = request.data.get('label')
         annotation_community = request.data.get('annotation_community')
-        owner=Userprofile.objects.get(user__username__iexact=username)
+        owner=Userprofile.objects.get(user__username__exact=username)
 
         new_annotation=Annotation()
 

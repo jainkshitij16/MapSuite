@@ -173,7 +173,6 @@ def validate_join_community(fn):
             },
             status=status.HTTP_400_BAD_REQUEST
             )
-
         return fn(*args, **kwargs)
     return join_decorator
 
