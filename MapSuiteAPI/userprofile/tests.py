@@ -32,8 +32,7 @@ class UserTestClass(APITestCase):
                          longitude=-1.00,
                          ann_text='',
                          ann_date_time='',
-                         label='home',
-                         annotation_privacy=False):
+                         label='home'):
         if owner is not None and location_name != '' and latitude !=-1 and longitude !=-1 and ann_text !='' and ann_date_time is not None:
             return Annotation.objects.create(owner=owner,
                                              location_name=location_name,
@@ -41,8 +40,7 @@ class UserTestClass(APITestCase):
                                              longitude=longitude,
                                              ann_text=ann_text,
                                              ann_date_time=ann_date_time,
-                                             label=label,
-                                             annotation_privacy=annotation_privacy)
+                                             label=label)
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_superuser(username='test',
@@ -92,8 +90,7 @@ class UserTestClass(APITestCase):
                              longitude=122.4356,
                              ann_text='Test user ann text number 1',
                              ann_date_time=timezone.now(),
-                             label='Custom',
-                             annotation_privacy=False)
+                             label='Custom')
 
         cls.createAnnotation(owner=userprofile_two,
                              location_name='Test user location number 2',
@@ -101,8 +98,7 @@ class UserTestClass(APITestCase):
                              longitude=97.2432,
                              ann_text='Test user ann text number 2',
                              ann_date_time=timezone.now(),
-                             label='Home',
-                             annotation_privacy=True)
+                             label='Home')
 
         cls.createAnnotation(owner=userprofile_three,
                              location_name='Test user location number 3',
@@ -110,8 +106,7 @@ class UserTestClass(APITestCase):
                              longitude=175.2432,
                              ann_text='Test user ann text number 3',
                              ann_date_time=timezone.now(),
-                             label='Office',
-                             annotation_privacy=False)
+                             label='Office')
 
         cls.createAnnotation(owner=userprofile_four,
                              location_name='UBC',
@@ -119,8 +114,7 @@ class UserTestClass(APITestCase):
                              longitude=122.4534,
                              ann_text='Test user ann text number 4',
                              ann_date_time=timezone.now(),
-                             label='Research',
-                             annotation_privacy=False)
+                             label='Research')
 
         cls.createAnnotation(owner=userprofile_five,
                              location_name='Test',
@@ -128,8 +122,7 @@ class UserTestClass(APITestCase):
                              longitude=120.4356,
                              ann_text='Test user ann text number 5',
                              ann_date_time=timezone.now(),
-                             label='Attraction',
-                             annotation_privacy=False)
+                             label='Attraction')
 
         cls.createAnnotation(owner=userprofile_six,
                              location_name='UBC',
@@ -137,8 +130,7 @@ class UserTestClass(APITestCase):
                              longitude=123.5678,
                              ann_text='Test user ann text number 4',
                              ann_date_time=timezone.now(),
-                             label='Home',
-                             annotation_privacy=False)
+                             label='Home')
 
     def test_GetAllUsers(self):
 

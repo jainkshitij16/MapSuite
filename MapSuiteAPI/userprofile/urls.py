@@ -19,9 +19,12 @@ urlpatterns = [
     path('annotations/usergroup=<str:community>', views.getAnnotationsofCommunity.as_view(), name='com-annotations'),
     path('annotations', views.getAllAnnotations.as_view(), name='all-annotations'),
 
+    path('<str:username>/join_community', views.JoinCommunity.as_view(), name='join_community'),
     path('add_community', views.RegisterCommunity.as_view(), name='create-community'),
-    path('<str:model>/object_status_change/<int:pk>', views.Change.as_view(), name='join-community'),
-    path('communities', views.getcomm.as_view(), name='communities-all')
+    path('communities', views.getcomm.as_view(), name='communities-all'),
+
+    path('<str:model>/object_change/<int:pk>', views.ObjectChange.as_view(), name='object-change'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

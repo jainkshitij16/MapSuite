@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import status
 from django.contrib.auth.password_validation import validate_password, password_validators_help_texts
 from django.core.validators import validate_email
-from .models import User
+from .models import User, Annotation, Userprofile, Community
 from .validators import latitudevalidator, longitudevalidator
 
 def validate_user_request_data(fn):
@@ -81,6 +81,15 @@ def validate_annotation_request_data(fn):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+        try:
+            Userprofile.objects.get(user__username__iexact=username)
+        except:
+            return Response(
+                data={
+                    'Error':'The username does not exist, Please make sure you enter a valid username'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return fn(*args,**kwargs)
     return annotation_decorator
 
@@ -102,5 +111,69 @@ def validate_community_request_data(fn):
             },
             status=status.HTTP_400_BAD_REQUEST
             )
+        if Community.objects.filter(community_name=community_name):
+            return Response(
+                data={
+                    'Error':'the community already exists, please enter through join community'
+                },
+            status=status.HTTP_400_BAD_REQUEST
+            )
         return fn(*args,**kwargs)
     return community_decorator
+
+def validate_object_change_data(fn):
+    def object_decorator(*args, **kwargs):
+
+        model=kwargs['model']
+        pk=kwargs['pk']
+
+        if model=='userprofile':
+            try:
+                Userprofile.objects.get(pk=pk)
+            except:
+                return Response(data={
+                    'Error':'Could not find the desired user, are you sure you are looking for the right user profile'
+                },
+                    status=status.HTTP_400_BAD_REQUEST)
+
+        if model=='annotation':
+            try:
+                Annotation.objects.get(pk=pk)
+            except:
+                return Response(data={
+                    'Error':'Could not find the desired annotation, are you sure you are looking for the right annotation'
+                },
+                    status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response(data={
+                'Error': 'Please make sure the request arguments are correct'
+            },
+                status=status.HTTP_400_BAD_REQUEST)
+        return fn(*args, **kwargs)
+    return object_decorator
+
+def validate_join_community(fn):
+    def join_decorator(*args, **kwargs):
+
+        user_community=args[0].request.data.get('user_community')
+        username=kwargs['username']
+
+        if None in (user_community, username):
+            return Response(
+                data={
+                    'Error': 'Please enter the community name and username'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif user_community == '':
+            return Response(
+                data={
+                    'Error': 'The community name cannot be blank'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return fn(*args, **kwargs)
+    return join_decorator
+

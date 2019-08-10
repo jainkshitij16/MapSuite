@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .validators import *
+from .validators import latitudevalidator, longitudevalidator, datevalidator, timezone
 # Create your models here.
 
 class Community(models.Model):
@@ -32,10 +32,10 @@ class Userprofile(models.Model):
         user_bio: Character field, max_length = 180
             the user biography, a representation of what the user is all about
 
-        community: Character field, max_length = 50
+        user_community: Character field, max_length = 50
             the user grouping field, used to classify various users
 
-        private: Boolean field, Required (default False)
+        user_privacy: Boolean field, Required (default False)
             User flag, used to identify if the user is okay sharing the annotations or not
 
         isdeleted: Boolean field, Required (default False)
@@ -100,9 +100,7 @@ class Annotation(models.Model):
     ann_date_time = models.DateTimeField(blank=False, default=timezone.now, validators=[datevalidator], help_text='The date and time this annotation holds importance for you')
     ann_file = models.FileField(blank=True)
     label = models.TextField(help_text='The tag to identify whether the annotation represents any category', blank=True)
-    annotation_community = models.ManyToManyField(Community, blank=True)
-    annotation_privacy = models.BooleanField(default=False, help_text='Is the annotation private or not')
-    #TODO: Question about this field, better implementation if user is private then just keep all annotations private except for community members
+    annotation_community = models.ForeignKey(Community, blank=True, on_delete=models.CASCADE, null=True)
 
 
 
