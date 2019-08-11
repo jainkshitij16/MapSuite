@@ -77,3 +77,13 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'label',
                   'ann_file',
                   'community')
+
+class TokenSerializer(serializers.Serializer):
+
+    """
+    A class which is used to represent the token that is generated post a successful login
+    Required for transforming data from JSON to native python data types and vice-versa
+    """
+
+    token = serializers.CharField(max_length=255)
+

@@ -6,11 +6,12 @@ urlpatterns = [
 
     path('users',views.getAllUsers.as_view(), name='all-users'),
     path('usergroup=<str:community>', views.getAllUserswithCom.as_view(), name='com-users'),
-    path('username=<str:username>/annotations=<str:keyword>', views.getSingleUserAnnotation.as_view(), name='user-singleannotation'),
+    path('username=<str:username>/annotations=<str:keyword>', views.getUserAnnotationKeyword.as_view(), name='user-locationkeyword'),
     path('username=<str:username>/label=<str:label>',views.getUserLabel.as_view(), name='user-label'),
     path('username=<str:username>/annotations',views.getUserAnnotations.as_view(), name='user-annotations'),
 
     path('register_user', views.RegisterUser.as_view(), name='create-user'),
+    path('login_user', views.LoginView.as_view(), name='login-user'),
     path('add_annotation', views.RegisterAnnotation.as_view(), name='create-annotation'),
 
     path('annotations=<str:keyword>/users', views.getAnnotationUsers.as_view(), name='annotation-users'),

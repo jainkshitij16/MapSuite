@@ -38,6 +38,12 @@ def validate_user_request_data(fn):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+        if User.objects.filter(username=username):
+            return Response(data={
+                'Error':'The username already exists, please use a different username'
+            },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return fn(*args,**kwargs)
     return user_decorator
 
@@ -104,7 +110,7 @@ def validate_community_request_data(fn):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        elif community_name == '':
+        elif community_name=='':
             return Response(
                 data={
                     'Error': 'The community name cannot be blank'
@@ -135,8 +141,7 @@ def validate_object_change_data(fn):
                     'Error':'Could not find the desired user, are you sure you are looking for the right user profile'
                 },
                     status=status.HTTP_400_BAD_REQUEST)
-
-        if model=='annotation':
+        elif model=='annotation':
             try:
                 Annotation.objects.get(pk=pk)
             except:
@@ -144,7 +149,6 @@ def validate_object_change_data(fn):
                     'Error':'Could not find the desired annotation, are you sure you are looking for the right annotation'
                 },
                     status=status.HTTP_400_BAD_REQUEST)
-
         else:
             return Response(data={
                 'Error': 'Please make sure the request arguments are correct'
@@ -166,12 +170,21 @@ def validate_join_community(fn):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        elif user_community == '':
+        elif user_community=='':
             return Response(
                 data={
                     'Error': 'The community name cannot be blank'
             },
             status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            Userprofile.objects.get(user__username__exact=username)
+        except:
+            return Response(data={
+                'Error':'Could not get the userprofile to add the community too'
+            },
+                status=status.HTTP_400_BAD_REQUEST
             )
         return fn(*args, **kwargs)
     return join_decorator

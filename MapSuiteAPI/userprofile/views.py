@@ -1,16 +1,20 @@
 from .models import Annotation,Userprofile, User, Community
-from .serializers import UserprofileSerializer, AnnotationSerializer, CommunitySerializer
+from .serializers import UserprofileSerializer, AnnotationSerializer, CommunitySerializer, TokenSerializer
 from .decorators import validate_user_request_data, validate_annotation_request_data, \
     validate_community_request_data, validate_object_change_data, validate_join_community
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
-from django.contrib.auth.decorators import login_required
+from rest_framework_jwt.settings import api_settings
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import make_password
+
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
 
 # Create your views here.
 
-#TODO: Add if cases when user_privacy does not matter(custom permissions, is owner and/or current user)
-#TODO: Add suport for adding a file through the front end
-#login_required(login_url=)
+#TODO: Add suport for adding a file through the front end, set up S3 and rds
 
 #______________POST ENDPOINTS_____________________________________
 
@@ -24,6 +28,8 @@ class RegisterUser(generics.CreateAPIView):
     :parameter : The class that is used to generate the viewsets
     :return : Status 201, the created userprofile object
     """
+
+    permission_classes = (permissions.AllowAny,)
 
     @validate_user_request_data
     def post(self, request, *args, **kwargs):
@@ -72,6 +78,42 @@ class RegisterUser(generics.CreateAPIView):
             status= status.HTTP_201_CREATED
         )
 
+class LoginView(generics.CreateAPIView):
+
+    """
+    Class to support the login functionality into the application
+
+    :request verb: POST
+    :endpoint : http://localhost:8000/login
+    :parameter: The class that is used to generate the viewsets
+    """
+
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+
+        """
+        Creates a new token upon successful authentication
+
+        :param request: user info
+        :param args:
+        :param kwargs:
+        :return: Created token and status 201
+        """
+
+        username = request.data.get('username', '')
+        password = request.data.get('password', '')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            serializer = TokenSerializer(data={
+                'token': jwt_encode_handler(
+                    jwt_payload_handler(user)
+                )})
+            serializer.is_valid()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(data={'error': 'No User found with such credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 class JoinCommunity(generics.UpdateAPIView):
 
     """
@@ -81,6 +123,8 @@ class JoinCommunity(generics.UpdateAPIView):
     :endpoint : http://localhost:8000/username/join_community
     :parameter: The class that is used to generate the viewsets
     """
+
+    permission_classes = (permissions.IsAuthenticated,)
 
     @validate_join_community
     def patch(self, request, *args, **kwargs):
@@ -96,15 +140,8 @@ class JoinCommunity(generics.UpdateAPIView):
 
         user_community=request.data.get('user_community')
         username=kwargs['username']
+        userprofile=Userprofile.objects.get(user__username__exact=username)
 
-        try:
-            userprofile=Userprofile.objects.get(user__username__exact=username)
-        except:
-            return Response(data={
-                'Error':'Could not get the userprofile to add the community too'
-            },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         communities = []
         if  Community.objects.filter(userprofile__user__username=username):
             prior_communities=Community.objects.get(userprofile__user__username=username)
@@ -127,29 +164,6 @@ class JoinCommunity(generics.UpdateAPIView):
             data=UserprofileSerializer(userprofile).data,
             status=status.HTTP_200_OK)
 
-class LoginView(generics.CreateAPIView):
-
-    """
-    Class to support the login functionality into the application
-
-    :request verb: POST
-    :endpoint : http://localhost:8000/login
-    :parameter: The class that is used to generate the viewsets
-    """
-
-    def post(self, request, *args, **kwargs):
-
-        """
-        Creates a new token upon successful authentication
-
-        :param request: user info
-        :param args:
-        :param kwargs:
-        :return: Created token and status 201
-        """
-
-        #TODO: Add JWT Support
-
 class RegisterAnnotation(generics.CreateAPIView):
 
     """
@@ -160,6 +174,8 @@ class RegisterAnnotation(generics.CreateAPIView):
     :parameter : The class that is used to generate the viewsets
     return : Status 201, the created annotation
     """
+
+    permission_classes = (permissions.IsAuthenticated,)
 
     @validate_annotation_request_data
     def post(self, request, *args, **kwargs):
@@ -228,6 +244,8 @@ class RegisterCommunity(generics.CreateAPIView):
     :return : status 201, the created community
     """
 
+    permission_classes = (permissions.IsAuthenticated,)
+
     @validate_community_request_data
     def post(self, request, *args, **kwargs):
 
@@ -257,6 +275,8 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
     """
 
     serializer_class = Userprofile
+    #permission_classes = (permissions.IsAuthenticated,)
+    # TODO: Change to custom permission where user is is the owner
 
     def get_queryset(self):
 
@@ -284,16 +304,16 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
         :return: Returns the retrieved object with the accurate view and status 200
         """
 
-        model = kwargs['model']
+        model=kwargs['model']
         if model=='userprofile':
-                userprofile = self.get_queryset()
+                userprofile=self.get_queryset()
                 userprofile_serialize = UserprofileSerializer(userprofile)
                 return Response({
                     'Userprofile':userprofile_serialize.data
                 },
                     status=status.HTTP_200_OK)
         elif model=='annotation':
-                annotation = self.get_queryset()
+                annotation=self.get_queryset()
                 annotation_serialize = AnnotationSerializer(annotation)
                 return Response({
                     'Annotation':annotation_serialize.data
@@ -309,10 +329,40 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
         :param request: Contains the JSON object of what is to be updated with what
         :param args:
         :param kwargs:
-        :return: The updated model with the status 2XX
+        :return: The updated model with the status 200
         """
 
-        #TODO: Finish this and test the function
+        model=kwargs['model']
+
+        if model=='annotation':
+            annotation=self.get_queryset()
+            if 'location_name' in request.data:
+                annotation.location_name=request.data.get('location_name')
+            if 'latitude' in request.data:
+                annotation.latitude=request.data.get('latitude')
+            if 'longitude' in request.data:
+                annotation.longitude=request.data.get('longitude')
+            if 'ann_text' in request.data:
+                annotation.ann_text=request.data.get('ann_text')
+            if 'label' in request.data:
+                annotation.label=request.data.get('label')
+            return Response(
+                data=AnnotationSerializer(annotation).data,
+                status=status.HTTP_200_OK
+            )
+
+        if model=='userprofile':
+            userprofile=self.get_queryset()
+            if 'user_bio' in request.data:
+                userprofile.user_bio=request.data.get('user_bio')
+            if 'user_privacy' in request.data:
+                userprofile.user_privacy=request.data.get('user_privacy')
+            if 'password' in request.data:
+                userprofile.user.password=make_password(request.data.get('password'))
+            return Response(
+                data=UserprofileSerializer(userprofile).data,
+                status=status.HTTP_200_OK
+            )
 
     @validate_object_change_data
     def delete(self, request, *args, **kwargs):
@@ -360,6 +410,7 @@ class getcomm(generics.ListAPIView):
     model = Community
     serializer_class = CommunitySerializer
     queryset = Community.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
 
 class getAllUsers(generics.ListCreateAPIView):
 
@@ -375,7 +426,7 @@ class getAllUsers(generics.ListCreateAPIView):
     model = Userprofile
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
-    #permission_classes = (permissions.IsAdminUser)
+    permission_classes = (permissions.IsAdminUser,)
 
 class getAllUserswithCom(generics.ListAPIView):
 
@@ -389,7 +440,7 @@ class getAllUserswithCom(generics.ListAPIView):
     """
 
     serializer_class = UserprofileSerializer
-    #permission_class = admin only
+    permission_class = (permissions.IsAdminUser,)
 
     def get_queryset(self):
 
@@ -412,6 +463,7 @@ class getUserAnnotations(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
     def get_queryset(self):
 
@@ -439,6 +491,8 @@ class getUserLabel(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    #TODO: Change this to custom owner permissions
 
     def get_queryset(self):
 
@@ -452,7 +506,7 @@ class getUserLabel(generics.ListAPIView):
                                          owner__isdeleted=False,
                                          owner__user_privacy=False)
 
-class getSingleUserAnnotation(generics.ListAPIView):
+class getUserAnnotationKeyword(generics.ListAPIView):
 
     """
     Returns the requested annotation of the user by the location name keyword
@@ -464,6 +518,9 @@ class getSingleUserAnnotation(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    # TODO: Change this to custom owner permissions
+
 
     def get_queryset(self):
 
@@ -494,6 +551,7 @@ class getAllAnnotations(generics.ListCreateAPIView):
     model = Annotation
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
+    permission_classes = (permissions.IsAuthenticated)
 
 class getAnnotionfromKeyword(generics.ListAPIView):
 
@@ -507,6 +565,7 @@ class getAnnotionfromKeyword(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
 
@@ -532,6 +591,7 @@ class getAnnotationUsers(generics.ListAPIView):
     """
 
     serializer_class = UserprofileSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
 
@@ -557,6 +617,7 @@ class getAnnotationwithTextKeyword(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
 
@@ -582,6 +643,7 @@ class getAnnotationsofCommunity(generics.ListAPIView):
     """
 
     serializer_class = AnnotationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
 
