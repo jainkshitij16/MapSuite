@@ -37,7 +37,8 @@ class UserprofileSerializer(serializers.ModelSerializer):
                   'username',
                   'user_bio',
                   'community',
-                  'user_privacy',)
+                  'user_privacy',
+                  'id')
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -76,7 +77,8 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'ann_date_time',
                   'label',
                   'ann_file',
-                  'community')
+                  'community',
+                  'id')
 
 class TokenSerializer(serializers.Serializer):
 

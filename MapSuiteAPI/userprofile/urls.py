@@ -24,7 +24,7 @@ urlpatterns = [
     path('add_community', views.RegisterCommunity.as_view(), name='create-community'),
     path('communities', views.getcomm.as_view(), name='communities-all'),
 
-    path('<str:model>/object_change/<int:pk>', views.ObjectChange.as_view(), name='object-change'),
+    path('<str:model>/object_change/<int:pk>', views.ObjectChange.as_view(), name='object-change'), #TODO: Think about doing this without pk (maybe lat lon)
 
 ]
 
