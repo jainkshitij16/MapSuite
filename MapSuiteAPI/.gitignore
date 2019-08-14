@@ -3,6 +3,5 @@
 *.py~
 env
 __pycache__
-migrations
 local_settings.py
 .idea
