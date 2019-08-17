@@ -65,9 +65,9 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day',
     },
-    #'DEFAULT_PERMISSION_CLASSES': (
-    #    'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-    #),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ),
 }
 
 JWT_AUTH = {
