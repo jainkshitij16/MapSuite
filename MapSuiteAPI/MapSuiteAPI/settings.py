@@ -10,9 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
-from .local_settings import *
 import datetime
+import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if 'SECRET_KEY_PROD' in os.environ:
     SECRET_KEY = os.environ['SECRET_KEY_PROD']
 else:
-    SECRET_KEY = os.environ('SECRET_KEY_MAPSUITE')
+    SECRET_KEY = os.environ['SECRET_KEY_MAPSUITE']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if 'DEBUG_PROD' in os.environ:
@@ -32,7 +31,7 @@ if 'DEBUG_PROD' in os.environ:
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','mapsuite.ca-central-1.elasticbeanstalk.com']
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
