@@ -655,5 +655,20 @@ class getAnnotationsofCommunity(generics.ListAPIView):
         return Annotation.objects.filter(owner__user_community=self.kwargs['community'],
                                          owner__isdeleted=False,)
 
+class getHealth(generics.ListAPIView):
 
+    """
+    Returns a 200 status whenever accessed
+    """
+    
+    serializer_class = UserprofileSerializer
+    queryset = Userprofile.objects.all()
 
+    def get(self, request, *args, **kwargs):
+
+        """
+        Sets the health of the eb instance
+        :return: 200 status code
+        """
+
+        return Response(status=status.HTTP_200_OK)

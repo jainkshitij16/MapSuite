@@ -4,6 +4,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
 
+    path('health', views.getHealth.as_view(), name='health'),
+
     path('users',views.getAllUsers.as_view(), name='all-users'),
     path('usergroup=<str:community>', views.getAllUserswithCom.as_view(), name='com-users'),
     path('username=<str:username>/annotations=<str:keyword>', views.getUserAnnotationKeyword.as_view(), name='user-locationkeyword'),
