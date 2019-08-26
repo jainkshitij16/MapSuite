@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19cb123f-5fce-4c24-a099-396806413b95" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MapSuiteAPI/settings.py" afterPath="$PROJECT_DIR$/MapSuiteAPI/settings.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/userprofile/urls.py" afterPath="$PROJECT_DIR$/userprofile/urls.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/userprofile/views.py" afterPath="$PROJECT_DIR$/userprofile/views.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,12 +15,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/MapSuiteAPI/settings.py">
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/userprofile/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="534">
-              <caret line="191" column="17" lean-forward="true" selection-start-line="191" selection-start-column="17" selection-end-line="191" selection-end-column="17" />
-              <folding />
+            <state relative-caret-position="90">
+              <caret line="6" column="61" lean-forward="false" selection-start-line="6" selection-start-column="61" selection-end-line="6" selection-end-column="61" />
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/userprofile/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="564">
+              <caret line="662" column="4" lean-forward="false" selection-start-line="662" selection-start-column="4" selection-end-line="662" selection-end-column="4" />
+              <folding>
+                <element signature="e#0#59#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -35,11 +51,12 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/MapSuiteAPI/MapSuiteAPI/settings.py" />
         <option value="$PROJECT_DIR$/.ebextensions/django-db.config" />
-        <option value="$PROJECT_DIR$/userprofile/views.py" />
         <option value="$PROJECT_DIR$/userprofile/models.py" />
         <option value="$PROJECT_DIR$/.ebextensions/db-migrate.config" />
         <option value="$PROJECT_DIR$/.ebextensions/django.config" />
         <option value="$PROJECT_DIR$/MapSuiteAPI/settings.py" />
+        <option value="$PROJECT_DIR$/userprofile/urls.py" />
+        <option value="$PROJECT_DIR$/userprofile/views.py" />
       </list>
     </option>
   </component>
@@ -87,6 +104,11 @@
               <item name="MapSuite" type="b2602c69:ProjectViewProjectNode" />
               <item name="MapSuite" type="462c0819:PsiDirectoryNode" />
               <item name="MapSuiteAPI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MapSuite" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MapSuite" type="462c0819:PsiDirectoryNode" />
+              <item name="userprofile" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -340,16 +362,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/userprofile/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2295">
-          <caret line="153" column="38" lean-forward="false" selection-start-line="153" selection-start-column="38" selection-end-line="153" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#59#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/userprofile/admin.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -410,9 +422,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MapSuiteAPI/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="534">
+        <state relative-caret-position="2850">
           <caret line="191" column="17" lean-forward="true" selection-start-line="191" selection-start-column="17" selection-end-line="191" selection-end-column="17" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MapSuiteAPI/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="20" column="42" lean-forward="true" selection-start-line="20" selection-start-column="42" selection-end-line="20" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/userprofile/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="61" lean-forward="false" selection-start-line="6" selection-start-column="61" selection-end-line="6" selection-end-column="61" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/userprofile/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="564">
+          <caret line="662" column="4" lean-forward="false" selection-start-line="662" selection-start-column="4" selection-end-line="662" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#59#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
