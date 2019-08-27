@@ -38,7 +38,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
 
-#TODO: Need to add S3 and set up an endpoint for health that returns status 200
+#TODO: Need to add S3
 
 INSTALLED_APPS = [
     'django.contrib.admin',

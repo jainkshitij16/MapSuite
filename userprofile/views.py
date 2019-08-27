@@ -275,7 +275,7 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
     """
 
     serializer_class = Userprofile
-    #permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
     # TODO: Change to custom permission where user is is the owner
 
     def get_queryset(self):
@@ -346,6 +346,8 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
                 annotation.ann_text=request.data.get('ann_text')
             if 'label' in request.data:
                 annotation.label=request.data.get('label')
+
+            annotation.save()
             return Response(
                 data=AnnotationSerializer(annotation).data,
                 status=status.HTTP_200_OK
@@ -359,6 +361,7 @@ class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
                 userprofile.user_privacy=request.data.get('user_privacy')
             if 'password' in request.data:
                 userprofile.user.password=make_password(request.data.get('password'))
+            userprofile.save()
             return Response(
                 data=UserprofileSerializer(userprofile).data,
                 status=status.HTTP_200_OK
@@ -660,7 +663,7 @@ class getHealth(generics.ListAPIView):
     """
     Returns a 200 status whenever accessed
     """
-    
+
     serializer_class = UserprofileSerializer
     queryset = Userprofile.objects.all()
 
