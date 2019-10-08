@@ -554,7 +554,7 @@ class getAllAnnotations(generics.ListCreateAPIView):
     model = Annotation
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
-    permission_classes = (permissions.IsAuthenticated)
+    permission_classes = (permissions.IsAuthenticated,)
 
 class getAnnotionfromKeyword(generics.ListAPIView):
 
