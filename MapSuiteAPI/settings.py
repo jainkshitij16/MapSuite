@@ -33,12 +33,9 @@ else:
 
 ALLOWED_HOSTS = ['localhost','mapsuite.ca-central-1.elasticbeanstalk.com']
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Application definition
-
-#TODO: Need to add S3
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'userprofile',
+    'storages',
 
 
 ]
@@ -164,6 +162,18 @@ else:
         }
     }
 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+AWS_REGION = 'ca-central-1'
+AWS_S3_HOST = 's3.%s.amazonaws.com' % AWS_REGION
+
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.ca-central-1.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+MEDIA_URL = 'https://%s/' % AWS_S3_CUSTOM_DOMAIN
+MEDIA_ROOT = MEDIA_URL
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
