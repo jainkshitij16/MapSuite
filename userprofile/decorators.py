@@ -99,6 +99,38 @@ def validate_annotation_request_data(fn):
         return fn(*args,**kwargs)
     return annotation_decorator
 
+def validate_annotation_file(fn):
+    def file_decorator(*args, **kwargs):
+        pk=kwargs['pk']
+        file=args[0].request.FILES['file']
+
+        if pk is None:
+            return Response(
+                data={
+                    'Error': 'Something went wrong with id of the annotation'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            Annotation.objects.get(pk=pk)
+        except:
+            return Response(
+                data={
+                    'Error':'Something went wrong with the annotation id getter'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if file is None:
+            return Response(
+                data={
+                    'Error': 'The file is not present'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return fn(*args, **kwargs)
+    return file_decorator
+
 def validate_community_request_data(fn):
     def community_decorator(*args, **kwargs):
         community_name= args[0].request.data.get('community_name')

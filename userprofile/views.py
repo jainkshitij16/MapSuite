@@ -1,7 +1,7 @@
 from .models import Annotation,Userprofile, User, Community
 from .serializers import UserprofileSerializer, AnnotationSerializer, CommunitySerializer, TokenSerializer
 from .decorators import validate_user_request_data, validate_annotation_request_data, \
-    validate_community_request_data, validate_object_change_data, validate_join_community
+    validate_community_request_data, validate_object_change_data, validate_join_community, validate_annotation_file
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 from rest_framework_jwt.settings import api_settings
@@ -14,7 +14,6 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 # Create your views here.
 
-#TODO: Add suport for adding a file through the front end, set up S3 and rds
 
 #______________POST ENDPOINTS_____________________________________
 
@@ -233,6 +232,38 @@ class RegisterAnnotation(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
 
+class UploadFile(generics.UpdateAPIView):
+
+    """
+    Adds a file to the annotation
+
+    :request verb: PATCH
+    :endpoint: http://localhost:8000/annotations=pk/add_file
+    :parameter: The class that is used to generate the viewsets
+    :return: status 200, the added file to the annotation
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @validate_annotation_file
+    def patch(self, request, *args, **kwargs):
+
+        """
+        Adds a file to the annotation
+
+        :param request: file to add
+        :param args:
+        :param kwargs: id of the annotation
+        :return: status 200 and the annotation object
+        """
+        annotation=Annotation.objects.get(pk=kwargs['pk'])
+        annotation.ann_file=request.FILES['file']
+        annotation.save()
+        return Response(
+            data=AnnotationSerializer(annotation).data,
+            status=status.HTTP_200_OK
+        )
+
 class RegisterCommunity(generics.CreateAPIView):
 
     """
@@ -266,12 +297,12 @@ class RegisterCommunity(generics.CreateAPIView):
 class ObjectChange(generics.RetrieveUpdateDestroyAPIView):
 
     """
-    Adds the selected lists of communities to the userprofile
+    Updates or deletes the desired model with the desired updates
 
     :request verb: GET, PATCH, DELETE
-    :endpoint : http://localhost:8000/model/join_communities/pk
+    :endpoint : http://localhost:8000/model/object_change/pk
     :parameter : The class that is used to generate the viewsets
-    :return : status 201, the updated userprofile
+    :return : status 201, the updated model
     """
 
     serializer_class = Userprofile
