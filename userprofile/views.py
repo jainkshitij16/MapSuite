@@ -483,7 +483,7 @@ class getAllUserswithCom(generics.ListAPIView):
         :return: selected users
         """
 
-        return Userprofile.objects.filter(user_community=self.kwargs['community'])
+        return Userprofile.objects.filter(user_community__community_name=self.kwargs['community'])
 
 class getUserAnnotations(generics.ListAPIView):
 
@@ -509,9 +509,13 @@ class getUserAnnotations(generics.ListAPIView):
         """
 
         #user = self.request.user Use this post persmissions
-        return Annotation.objects.filter(owner__user__username=self.kwargs['username'],
-                                         owner__isdeleted=False,
-                                         owner__user_privacy=False)
+        annotations = Annotation.objects.filter(owner__user__username=self.kwargs['username'],
+                                                owner__isdeleted=False,)
+
+        if annotations.exists():
+            return annotations
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 class getUserLabel(generics.ListAPIView):
 
