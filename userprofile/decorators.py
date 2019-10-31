@@ -47,6 +47,36 @@ def validate_user_request_data(fn):
         return fn(*args,**kwargs)
     return user_decorator
 
+def validate_user_login_data(fn):
+    def login_decorator(*args, **kwargs):
+        username= args[0].request.data.get('username')
+        password= args[0].request.data.get('password')
+
+        if None in (username, password):
+            return Response(
+                data= {
+                    'Error':'Username, password'
+                },
+                status= status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            user = Userprofile.objects.get(user__username=username)
+        except:
+            return Response(
+                data={
+                    'Error': 'The user with the desired credentials does not exist'
+                },
+                status= status.HTTP_400_BAD_REQUEST
+            )
+        if user.isdeleted:
+            return Response(data={
+                'Error': 'The user with the desired credentials does not exists or has been deleted'
+            },
+            status= status.HTTP_400_BAD_REQUEST
+            )
+        return fn(*args,**kwargs)
+    return login_decorator
+
 
 def validate_annotation_request_data(fn):
     def annotation_decorator(*args, **kwargs):

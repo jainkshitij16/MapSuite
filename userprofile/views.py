@@ -1,7 +1,9 @@
 from .models import Annotation,Userprofile, User, Community
 from .serializers import UserprofileSerializer, AnnotationSerializer, CommunitySerializer, TokenSerializer
 from .decorators import validate_user_request_data, validate_annotation_request_data, \
-    validate_community_request_data, validate_object_change_data, validate_join_community, validate_annotation_file
+    validate_community_request_data, validate_object_change_data, validate_join_community, \
+    validate_annotation_file, validate_user_login_data
+
 from rest_framework.views import Response, status
 from rest_framework import generics, permissions
 from rest_framework_jwt.settings import api_settings
@@ -89,6 +91,7 @@ class LoginView(generics.CreateAPIView):
 
     permission_classes = (permissions.AllowAny,)
 
+    @validate_user_login_data
     def post(self, request, *args, **kwargs):
 
         """
